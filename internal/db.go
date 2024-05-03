@@ -6,8 +6,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const (
+	database = "database.db"
+
+	BasicPlayer = "BasicPlayer"
+)
+
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "database.db")
+	db, err := sql.Open("sqlite3", database)
 	if err != nil {
 		return nil, err
 	}
@@ -87,15 +93,19 @@ func createDB(db *sql.DB) error {
 	}
 
 	// create basic bag of holding
-	if tx.QueryRow(`SELECT * FROM items WHERE name = "Bag of Holding"`).Scan(nil) == sql.ErrNoRows {
+	if tx.QueryRow(`SELECT * FROM items WHERE isbag = true`).Scan(nil) == sql.ErrNoRows {
 		query = `INSERT INTO items (name, isbag) VALUES (?, ?)`
 		_, _ = tx.Exec(query, "Bag of Holding", true)
 	}
 
 	// create basic player
-	if tx.QueryRow(`SELECT * FROM players WHERE name = "Basic Player"`).Scan(nil) == sql.ErrNoRows {
-		query = `INSERT INTO players (name, level) VALUES (?, ?)`
-		_, _ = tx.Exec(query, "Basic Player", 99)
+	var name string
+	if tx.QueryRow(`SELECT name FROM players WHERE id = 0`).Scan(&name) == sql.ErrNoRows {
+		if name != BasicPlayer {
+			query = `UPDATE players SET id = id + 1`
+			_, _ = tx.Exec(query)
+		query = `INSERT INTO players (id, name) VALUES (?, ?)`
+		_, _ = tx.Exec(query, 0, "Basic Player")
 	}
 
 	return tx.Commit()
