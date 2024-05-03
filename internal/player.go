@@ -84,9 +84,8 @@ func (srv *Service) CreatePlayer(p Player) (*Player, error) {
 	return &p, err
 }
 
-func (srv *Service) UpdatePlayer(id int) error {
-	p := srv.GetPlayerByID(id)
-	query := `UPDATE players 
+func (srv *Service) UpdatePlayer(p Player) error {
+	query := `UPDATE players
 				SET
 					name=?,
 					level=?,
@@ -106,7 +105,7 @@ func (srv *Service) UpdatePlayer(id int) error {
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.Session, id)
+	_, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.Session, p.Id)
 	return err
 }
 

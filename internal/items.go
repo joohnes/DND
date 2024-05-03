@@ -40,9 +40,8 @@ func (srv *Service) CreateItem(i Item) (*Item, error) {
 	return &i, err
 }
 
-func (srv *Service) UpdateItem(id int) error {
-	i := srv.GetItemByID(id)
-	query := `UPDATE items 
+func (srv *Service) UpdateItem(i Item) error {
+	query := `UPDATE items
 				SET
 					name=?,
 					description=?,
@@ -53,11 +52,12 @@ func (srv *Service) UpdateItem(id int) error {
 					intelligence=?,
 					agility=?,
 					accuracy=?,
-					charisma=?
+					charisma=?,
+					owner=?
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, id)
+	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Owner, i.Id)
 	return err
 }
 

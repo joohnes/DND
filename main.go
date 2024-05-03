@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 
 	"github.com/gofiber/fiber/v3"
@@ -22,10 +21,8 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(srv.GetPlayers())
 	app := fiber.New()
-	app.Use(logger.New())
-	app.Use(cors.New())
+	app.Use(logger.New(), cors.New())
 	register(app, srv)
 
 	if err := app.Listen(":8000"); err != nil {

@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"net/http"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -79,8 +80,18 @@ func (srv *Service) DropItemRoute() func(ctx fiber.Ctx) error {
 }
 
 func (srv *Service) UpdatePlayerRoute() func(ctx fiber.Ctx) error {
-	// do poprawienia
 	return func(ctx fiber.Ctx) error {
-		return nil
+		var player Player
+		data := ctx.Body()
+		if err := json.Unmarshal(data, &player); err != nil {
+			return errors.Wrap(err, "UpdatePlayerRoute")
+		}
+
+		err := srv.UpdatePlayer(player)
+		if err != nil {
+			return errors.Wrap(err, "UpdatePlayerRoute")
+		}
+
+		return ctx.SendStatus(http.StatusOK)
 	}
 }
