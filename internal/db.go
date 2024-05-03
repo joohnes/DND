@@ -17,6 +17,8 @@ func ConnectDB() (*sql.DB, error) {
 
 func createDB(db *sql.DB) error {
 	var query string
+	tx, err := db.Begin()
+	defer tx.Rollback()
 
 	// table players
 	query = `CREATE TABLE IF NOT EXISTS players (
@@ -37,7 +39,7 @@ func createDB(db *sql.DB) error {
 	subrace TEXT,
 	session INTEGER
 );`
-	_, err := db.Exec(query)
+	_, err = tx.Exec(query)
 	if err != nil {
 		return err
 	}
@@ -55,9 +57,10 @@ func createDB(db *sql.DB) error {
 		intelligence INTEGER,
 		agility INTEGER,
 		accuracy INTEGER,
-		charisma INTEGER
+		charisma INTEGER,
+		isbag BOOLEAN
 	);`
-	_, err = db.Exec(query)
+	_, err = tx.Exec(query)
 	if err != nil {
 		return err
 	}
@@ -68,6 +71,32 @@ func createDB(db *sql.DB) error {
 		player INTEGER,
 		item INTEGER
 	);`
-	_, err = db.Exec(query)
-	return err
+	_, err = tx.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	// table bag of holding
+	query = `CREATE TABLE IF NOT EXISTS bag (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		item INTEGER
+		);`
+	_, err = tx.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	// create basic bag of holding
+	if tx.QueryRow(`SELECT * FROM items WHERE name = "Bag of Holding"`).Scan(nil) == sql.ErrNoRows {
+		query = `INSERT INTO items (name, isbag) VALUES (?, ?)`
+		_, _ = tx.Exec(query, "Bag of Holding", true)
+	}
+
+	// create basic player
+	if tx.QueryRow(`SELECT * FROM players WHERE name = "Basic Player"`).Scan(nil) == sql.ErrNoRows {
+		query = `INSERT INTO players (name, level) VALUES (?, ?)`
+		_, _ = tx.Exec(query, "Basic Player", 99)
+	}
+
+	return tx.Commit()
 }

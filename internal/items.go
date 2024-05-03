@@ -30,8 +30,8 @@ func (srv *Service) GetItems() []*Item {
 }
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {
-	query := "INSERT INTO players (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?,?, ?, ?)"
-	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma)
+	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, false)
 	if err != nil {
 		return nil, err
 	}
@@ -46,6 +46,7 @@ func (srv *Service) UpdateItem(i Item) error {
 					name=?,
 					description=?,
 					ability=?,
+					rarity=?,
 					strength=?,
 					endurance=?,
 					perception=?,
@@ -57,12 +58,12 @@ func (srv *Service) UpdateItem(i Item) error {
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Owner, i.Id)
+	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Owner, i.Id)
 	return err
 }
 
 func (srv *Service) GetItemsFromDB() ([]*Item, error) {
-	query := "SELECT * FROM items"
+	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma FROM items WHERE isbag != true"
 	rows, err := srv.db.Query(query)
 	defer func() { rows.Close() }()
 	if err != nil {
