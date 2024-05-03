@@ -119,7 +119,7 @@ func (srv *Service) DeletePlayer(id int) error {
 }
 
 func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
-	query := "SELECT * FROM players WHERE name != 'Basic Player'"
+	query := "SELECT * FROM players WHERE name != 'Basic Player' AND id != 0"
 	rows, err := srv.db.Query(query)
 	defer func() { rows.Close() }()
 	if err != nil {

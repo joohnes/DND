@@ -26,5 +26,6 @@ func NewService(db *sql.DB) (*Service, error) {
 
 	srv.items = items
 	srv.players = players
-	return srv, nil
+	srv.bag, err = srv.GetBagFromDB()
+	return srv, err
 }
