@@ -64,6 +64,7 @@ func createDB(db *sql.DB) error {
 		agility INTEGER,
 		accuracy INTEGER,
 		charisma INTEGER,
+		quantity INTEGER,
 		isbag BOOLEAN
 	);`
 	_, err = tx.Exec(query)
@@ -93,19 +94,20 @@ func createDB(db *sql.DB) error {
 	}
 
 	// create basic bag of holding
-	if tx.QueryRow(`SELECT * FROM items WHERE isbag = true`).Scan(nil) == sql.ErrNoRows {
-		query = `INSERT INTO items (name, isbag) VALUES (?, ?)`
+	if tx.QueryRow(`SELECT * FROM items WHERE isbag = true;`).Scan(nil) == sql.ErrNoRows {
+		query = `INSERT INTO items (name, isbag) VALUES (?, ?);`
 		_, _ = tx.Exec(query, "Bag of Holding", true)
 	}
 
 	// create basic player
 	var name string
-	if tx.QueryRow(`SELECT name FROM players WHERE id = 0`).Scan(&name) == sql.ErrNoRows {
+	if tx.QueryRow(`SELECT name FROM players WHERE id = 0;`).Scan(&name) == sql.ErrNoRows {
 		if name != BasicPlayer {
-			query = `UPDATE players SET id = id + 1`
+			query = `UPDATE players SET id = id + 1;`
 			_, _ = tx.Exec(query)
-		query = `INSERT INTO players (id, name) VALUES (?, ?)`
-		_, _ = tx.Exec(query, 0, "Basic Player")
+			query = `INSERT INTO players (id, name) VALUES (?, ?);`
+			_, _ = tx.Exec(query, 0, "Basic Player")
+		}
 	}
 
 	return tx.Commit()
