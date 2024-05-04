@@ -45,4 +45,9 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Get("/items", srv.GetItemsRoute())
 	app.Get("/item/:id", srv.GetItemRoute())
 	app.Put("/item/:id", srv.UpdateItemRoute())
+
+	// bag
+	app.Post("/bag/add/:playerID/:itemID", srv.AddItemToBagRoute())
+	app.Get("/bag", srv.GetBagRoute())
+	app.Post("/bag/transfer/:itemID/:playerID", srv.TransferItemRoute()))
 }

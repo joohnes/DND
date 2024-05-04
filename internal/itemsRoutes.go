@@ -62,3 +62,72 @@ func (srv *Service) UpdateItemRoute() func(ctx fiber.Ctx) error {
 		return ctx.SendStatus(http.StatusOK)
 	}
 }
+
+// bag routes
+func (srv *Service) AddItemToBagRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		itemID, err := strconv.Atoi(ctx.Params("itemID"))
+		if err != nil {
+			return errors.Wrap(err, "AddItemToBagRoute item id")
+		}
+
+		playerID, err := strconv.Atoi(ctx.Params("playerID"))
+		if err != nil {
+			return errors.Wrap(err, "AddItemToBagRoute player id")
+		}
+
+		bagID, err := srv.GetBagID()
+		if err != nil {
+			return errors.Wrap(err, "AddItemToBagRoute")
+		}
+
+		err = srv.DropItem(playerID, itemID)
+		if err != nil {
+			return errors.Wrap(err, "AddItemToBagRoute")
+		}
+
+		err = srv.AddItem(bagID, itemID)
+		if err != nil {
+			return errors.Wrap(err, "AddItemToBagRoute")
+		}
+
+		return ctx.SendStatus(http.StatusOK)
+	}
+}
+
+func (srv *Service) TransferItemFromBagRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		itemID, err := strconv.Atoi(ctx.Params("itemID"))
+		if err != nil {
+			return errors.Wrap(err, "TransferItemFromBagRoute item id")
+		}
+
+		playerID, err := strconv.Atoi(ctx.Params("playerID"))
+		if err != nil {
+			return errors.Wrap(err, "TransferItemFromBagRoute player id")
+		}
+
+		bagID, err := srv.GetBagID()
+		if err != nil {
+			return errors.Wrap(err, "TransferItemFromBagRoute")
+		}
+
+		err = srv.DropItem(bagID, itemID)
+		if err != nil {
+			return errors.Wrap(err, "TransferItemFromBagRoute")
+		}
+
+		err = srv.AddItem(playerID, itemID)
+		if err != nil {
+			return errors.Wrap(err, "TransferItemFromBagRoute")
+		}
+
+		return ctx.SendStatus(http.StatusOK)
+	}
+}
+
+func (srv *Service) GetBagRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		return ctx.JSON(srv.GetBag())
+	}
+}

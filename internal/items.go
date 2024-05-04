@@ -14,6 +14,7 @@ type Item struct {
 	Accuracy     int    `json:"accuracy"`
 	Charisma     int    `json:"charisma"`
 	Owner        int    `json:"owner"`
+	Quantity     int    `json:"quantity"`
 }
 
 func (srv *Service) GetItemByID(id int) *Item {
@@ -31,7 +32,7 @@ func (srv *Service) GetItems() []*Item {
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {
 	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, false)
+	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, false)
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +42,10 @@ func (srv *Service) CreateItem(i Item) (*Item, error) {
 }
 
 func (srv *Service) UpdateItem(i Item) error {
+	if serviceItem := srv.GetItemByID(i.Id); serviceItem != nil {
+		serviceItem = &i
+	}
+
 	query := `UPDATE items
 				SET
 					name=?,
@@ -54,16 +59,17 @@ func (srv *Service) UpdateItem(i Item) error {
 					agility=?,
 					accuracy=?,
 					charisma=?,
-					owner=?
+					owner=?,
+					quantity=?
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Owner, i.Id)
+	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Owner, i.Quantity, i.Id)
 	return err
 }
 
 func (srv *Service) GetItemsFromDB() ([]*Item, error) {
-	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma FROM items WHERE isbag != true"
+	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity FROM items WHERE isbag != true"
 	rows, err := srv.db.Query(query)
 	defer func() { rows.Close() }()
 	if err != nil {
@@ -99,6 +105,7 @@ func (srv *Service) GetItemsFromDB() ([]*Item, error) {
 			&i.Agility,
 			&i.Accuracy,
 			&i.Charisma,
+			&i.Quantity,
 		)
 
 		i.Owner = playerItems[i.Id]

@@ -2,7 +2,8 @@ package internal
 
 import (
 	"database/sql"
-	"errors"
+
+	"github.com/pkg/errors"
 )
 
 type Stat string
@@ -44,7 +45,7 @@ func (srv *Service) DropItem(playerID, itemID int) error {
 
 	query := "DELETE FROM player_items WHERE player=? AND item=?"
 	_, err := srv.db.Exec(query, playerID, itemID)
-	return err
+	return errors.Wrap(err, "failed to drop item")
 }
 
 func (srv *Service) AddItem(playerID, itemID int) error {
@@ -85,6 +86,9 @@ func (srv *Service) CreatePlayer(p Player) (*Player, error) {
 }
 
 func (srv *Service) UpdatePlayer(p Player) error {
+	if player := srv.GetPlayerByID(p.Id); player != nil {
+		player = &p
+	}
 	query := `UPDATE players
 				SET
 					name=?,

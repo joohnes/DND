@@ -44,3 +44,17 @@ func (srv *Service) GetBagFromDB() (*Bag, error) {
 	bag.Owner = srv.GetBagOwner()
 	return bag, nil
 }
+
+func (srv *Service) GetBagID() (int, error) {
+	var id int
+	query := `SELECT id FROM items where isbag = true`
+	err := srv.db.QueryRow(query).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func (srv *Service) GetBag() *Bag {
+	return srv.bag
+}
