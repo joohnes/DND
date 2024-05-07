@@ -6,37 +6,34 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Stat string
-type Class string
-
 type Player struct {
-	Id           int     `json:"id"`
-	Name         string  `json:"name"`
-	Level        int     `json:"level"`
-	Health       int     `json:"health"`
-	Mana         int     `json:"mana"`
-	Class        string  `json:"class"`
-	Race         string  `json:"race"`
-	Subrace      string  `json:"subrace"`
-	Strength     int     `json:"strength"`
-	Endurance    int     `json:"endurance"`
-	Perception   int     `json:"perception"`
-	Intelligence int     `json:"intelligence"`
-	Agility      int     `json:"agility"`
-	Accuracy     int     `json:"accuracy"`
-	Charisma     int     `json:"charisma"`
-	Session      int     `json:"session"`
-	Items        []*Item `json:"items"`
+	Id           int    `json:"id"`
+	Name         string `json:"name"`
+	Level        int    `json:"level"`
+	Health       int    `json:"health"`
+	Mana         int    `json:"mana"`
+	Class        string `json:"class"`
+	Race         string `json:"race"`
+	Subrace      string `json:"subrace"`
+	Strength     int    `json:"strength"`
+	Endurance    int    `json:"endurance"`
+	Perception   int    `json:"perception"`
+	Intelligence int    `json:"intelligence"`
+	Agility      int    `json:"agility"`
+	Accuracy     int    `json:"accuracy"`
+	Charisma     int    `json:"charisma"`
+	Session      int    `json:"session"`
+	Items        []int  `json:"items"`
 }
 
-func (p *Player) GetItems() []*Item {
+func (p *Player) GetItems() []int {
 	return p.Items
 }
 
 func (srv *Service) DropItem(playerID, itemID int) error {
 	p := srv.GetPlayerByID(playerID)
 	for i := 0; i < len(p.Items); i++ {
-		if p.Items[i].Id == itemID {
+		if p.Items[i] == itemID {
 			p.Items[i] = p.Items[len(p.Items)-1]
 			p.Items = p.Items[:len(p.Items)-1]
 		}
@@ -53,19 +50,23 @@ func (srv *Service) AddItem(playerID, itemID int) error {
 	if err != nil {
 		return err
 	}
-	item := srv.GetItemByID(itemID)
+
 	player := srv.GetPlayerByID(playerID)
 	if player == nil {
 		return errors.New("player with given id not found")
 	}
-	player.Items = append(player.Items, item)
+	player.Items = append(player.Items, itemID)
 	srv.GetItemByID(itemID).Owner = playerID
 
 	return nil
 }
 
-func (srv *Service) GetPlayers() []*Player {
-	return srv.players
+func (srv *Service) GetPlayersIDs() []int {
+	var ids []int
+	for _, p := range srv.players {
+		ids = append(ids, p.Id)
+	}
+	return ids
 }
 
 func (srv *Service) GetPlayerByID(id int) *Player {
@@ -78,10 +79,13 @@ func (srv *Service) GetPlayerByID(id int) *Player {
 }
 
 func (srv *Service) CreatePlayer(p Player) (*Player, error) {
-	query := "INSERT INTO players (name, level, class, race, subrace, strength, endurance, perception, intelligence, agility, accuracy, charisma, health, mana, session) VALUES (?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?, 100, 100, ?)"
+	query := "INSERT INTO players (name, level, class, race, subrace, strength, endurance, perception, intelligence, agility, accuracy, charisma, health, mana, session) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 100, 100, ?)"
 	res, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.Session)
 	id, _ := res.LastInsertId()
 	p.Id = int(id)
+	p.Health = 100
+	p.Mana = 100
+	srv.players = append(srv.players, &p)
 	return &p, err
 }
 
@@ -118,7 +122,7 @@ func (srv *Service) DeletePlayer(id int) error {
 	if err != nil {
 		return err
 	}
-	_, err = srv.db.Exec("DELETE FROM players WHERE player=?", id)
+	_, err = srv.db.Exec("DELETE FROM player_items WHERE player=?", id)
 	return err
 }
 
@@ -157,7 +161,7 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 			return nil, err
 		}
 
-		rows, err := srv.db.Query("SELECT * FROM items WHERE id in (SELECT item FROM player_items WHERE player = ?)", p.Id)
+		rows, err := srv.db.Query("SELECT * FROM player_items WHERE player = ?", p.Id)
 		defer func() { rows.Close() }()
 		if err != nil {
 			if err != sql.ErrNoRows {
@@ -167,23 +171,13 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 		}
 
 		for rows.Next() {
-			i := &Item{}
+			var itemID int
 			if err := rows.Scan(
-				&i.Id,
-				&i.Name,
-				&i.Description,
-				&i.Ability,
-				&i.Strength,
-				&i.Endurance,
-				&i.Perception,
-				&i.Intelligence,
-				&i.Agility,
-				&i.Accuracy,
-				&i.Charisma,
+				&itemID,
 			); err != nil {
 				return nil, err
 			}
-			p.Items = append(p.Items, i)
+			p.Items = append(p.Items, itemID)
 		}
 		players = append(players, p)
 	}

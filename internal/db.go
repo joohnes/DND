@@ -65,6 +65,7 @@ func createDB(db *sql.DB) error {
 		accuracy INTEGER,
 		charisma INTEGER,
 		quantity INTEGER,
+		equipped BOOLEAN,
 		isbag BOOLEAN
 	);`
 	_, err = tx.Exec(query)

@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -13,6 +14,7 @@ func (srv *Service) CreatePlayerRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var player Player
 		data := ctx.Body()
+		fmt.Println(string(data))
 		if err := json.Unmarshal(data, &player); err != nil {
 			return errors.Wrap(err, "CreatePlayerRoute")
 		}
@@ -41,9 +43,9 @@ func (srv *Service) GetPlayerRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) GetPlayersRoute() func(ctx fiber.Ctx) error {
+func (srv *Service) GetPlayersIDsRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		return ctx.JSON(srv.GetPlayers())
+		return ctx.JSON(srv.GetPlayersIDs())
 	}
 }
 

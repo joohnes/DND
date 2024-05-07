@@ -23,6 +23,7 @@ func main() {
 
 	app := fiber.New()
 	app.Use(logger.New(), cors.New())
+	// srv.TestObjects()
 	register(app, srv)
 
 	if err := app.Listen(":8000"); err != nil {
@@ -36,15 +37,16 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Post("/player", srv.CreatePlayerRoute())
 	app.Put("/player/:id", srv.UpdatePlayerRoute())
 	app.Get("/player/:id", srv.GetPlayerRoute())
-	app.Get("/players", srv.GetPlayersRoute())
+	app.Get("/players", srv.GetPlayersIDsRoute())
 	app.Post("/player/:playerID/add-item/:itemID", srv.AddItemRoute())
 	app.Delete("/player/:playerID/add-item/:itemID", srv.DropItemRoute())
 
 	// item
 	app.Post("/item", srv.CreateItemRoute())
-	app.Get("/items", srv.GetItemsRoute())
+	app.Get("/items", srv.GetItemsIDsRoute())
 	app.Get("/item/:id", srv.GetItemRoute())
 	app.Put("/item/:id", srv.UpdateItemRoute())
+	app.Put("/equip/:id", srv.EquipItemRoute())
 
 	// bag
 	app.Post("/bag/add/:playerID/:itemID", srv.AddItemToBagRoute())

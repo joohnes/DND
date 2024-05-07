@@ -2,6 +2,7 @@ package internal
 
 // bag of holding
 type Bag struct {
+	Id    int     `json:"-"`
 	Owner int     `json:"owner"`
 	Items []*Item `json:"items"`
 }
@@ -9,7 +10,7 @@ type Bag struct {
 func (srv *Service) GetBagOwner() int {
 	for _, player := range srv.players {
 		for _, item := range player.Items {
-			if item.Name == "Bag of Holding" {
+			if item == srv.bag.Id {
 				return player.Id
 			}
 		}

@@ -2,7 +2,7 @@ package internal
 
 import (
 	"encoding/json"
-	"net/http"
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -12,7 +12,9 @@ import (
 func (srv *Service) CreateItemRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var item Item
-		if err := json.Unmarshal(ctx.Body(), &item); err != nil {
+		data := ctx.Body()
+		fmt.Println(string(data))
+		if err := json.Unmarshal(data, &item); err != nil {
 			return errors.Wrap(err, "CreateItemRoute")
 		}
 
@@ -25,9 +27,9 @@ func (srv *Service) CreateItemRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) GetItemsRoute() func(ctx fiber.Ctx) error {
+func (srv *Service) GetItemsIDsRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		return ctx.JSON(srv.GetItems())
+		return ctx.JSON(srv.GetItemsIDs())
 	}
 }
 
@@ -59,7 +61,28 @@ func (srv *Service) UpdateItemRoute() func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "UpdateItemRoute")
 		}
 
-		return ctx.SendStatus(http.StatusOK)
+		return ctx.SendStatus(fiber.StatusOK)
+	}
+}
+
+func (srv *Service) EquipItemRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		itemID, err := strconv.Atoi(ctx.Params("itemID"))
+		if err != nil {
+			return errors.Wrap(err, "EquipItemRoute item id")
+		}
+
+		playerID, err := strconv.Atoi(ctx.Params("playerID"))
+		if err != nil {
+			return errors.Wrap(err, "EquipItemRoute player id")
+		}
+
+		err = srv.EquipItem(itemID, playerID)
+		if err != nil {
+			return errors.Wrap(err, "EquipItemRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
 	}
 }
 
@@ -91,7 +114,7 @@ func (srv *Service) AddItemToBagRoute() func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "AddItemToBagRoute")
 		}
 
-		return ctx.SendStatus(http.StatusOK)
+		return ctx.SendStatus(fiber.StatusOK)
 	}
 }
 
@@ -122,7 +145,7 @@ func (srv *Service) TransferItemFromBagRoute() func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "TransferItemFromBagRoute")
 		}
 
-		return ctx.SendStatus(http.StatusOK)
+		return ctx.SendStatus(fiber.StatusOK)
 	}
 }
 
