@@ -188,7 +188,7 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 			return nil, err
 		}
 
-		rows, err := srv.db.Query("SELECT * FROM player_items WHERE player = ?", p.Id)
+		rows, err := srv.db.Query("SELECT item FROM player_items WHERE player = ?", p.Id)
 		defer func() { rows.Close() }()
 		if err != nil {
 			if err != sql.ErrNoRows {

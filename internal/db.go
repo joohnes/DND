@@ -65,9 +65,9 @@ func createDB(db *sql.DB) error {
 		accuracy INTEGER,
 		charisma INTEGER,
 		quantity INTEGER,
-		equipped BOOLEAN,
-		isbag BOOLEAN
-	);`
+		equipped INTEGER
+ 	);`
+	// TODO: equipped
 	_, err = tx.Exec(query)
 	if err != nil {
 		return err
@@ -94,11 +94,11 @@ func createDB(db *sql.DB) error {
 		return err
 	}
 
-	// create basic bag of holding
-	if tx.QueryRow(`SELECT * FROM items WHERE isbag = true;`).Scan(nil) == sql.ErrNoRows {
-		query = `INSERT INTO items (name, isbag) VALUES (?, ?);`
-		_, _ = tx.Exec(query, "Bag of Holding", true)
-	}
+	// // create basic bag of holding
+	// if tx.QueryRow(`SELECT * FROM items WHERE isbag = true;`).Scan(nil) == sql.ErrNoRows {
+	// 	query = `INSERT INTO items (name, isbag) VALUES (?, ?);`
+	// 	_, _ = tx.Exec(query, "Bag of Holding", true)
+	// }
 
 	// create basic player
 	var name string

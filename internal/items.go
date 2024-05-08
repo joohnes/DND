@@ -15,9 +15,8 @@ type Item struct {
 	Agility      int    `json:"agility"`
 	Accuracy     int    `json:"accuracy"`
 	Charisma     int    `json:"charisma"`
-	Owner        int    `json:"owner"`
 	Quantity     int    `json:"quantity"`
-	Equipped     bool   `json:"equipped"`
+	Equipped     int    `json:"equipped"`
 }
 
 func (srv *Service) GetItemByID(id int) *Item {
@@ -32,6 +31,9 @@ func (srv *Service) GetItemByID(id int) *Item {
 func (srv *Service) GetItemsIDs() []int {
 	var ids []int
 	for _, i := range srv.items {
+		if srv.IsInBag(i.Id) {
+			continue
+		}
 		ids = append(ids, i.Id)
 	}
 	return ids
@@ -74,20 +76,28 @@ func (srv *Service) UpdateItem(i Item) error {
 	return srv.ResetObjects(ItemType)
 }
 
-func (srv *Service) EquipItem(id int, owner int) error {
-	query := "UPDATE items SET equipped = true, owner = ? WHERE id = ?"
-	_, err := srv.db.Exec(query, owner, id)
+func (srv *Service) EquipItem(itemID int, slot int) error {
+	query := "UPDATE items SET equipped = ? WHERE id = ?"
+	_, err := srv.db.Exec(query, slot, itemID)
 	if err != nil {
 		return err
 	}
-	item := srv.GetItemByID(id)
-	item.Owner = owner
-	item.Equipped = true
-	return nil
+
+	return srv.ResetObjects(ItemType)
+}
+
+func (srv *Service) UnequipItem(itemID int) error {
+	query := "UPDATE items SET equipped = 0 WHERE id = ?"
+	_, err := srv.db.Exec(query, itemID)
+	if err != nil {
+		return err
+	}
+
+	return srv.ResetObjects(ItemType)
 }
 
 func (srv *Service) GetItemsFromDB() ([]*Item, error) {
-	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity FROM items WHERE isbag != true"
+	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity FROM items"
 	rows, err := srv.db.Query(query)
 	defer func() { rows.Close() }()
 	if err != nil {

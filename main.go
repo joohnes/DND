@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/logger"
 
 	"dndEq/internal"
+	"dndEq/routes"
 )
 
 func main() {
@@ -34,26 +35,30 @@ func main() {
 
 func register(app *fiber.App, srv *internal.Service) {
 	// player
-	app.Post("/player", srv.CreatePlayerRoute())
-	app.Put("/player/:id", srv.UpdatePlayerRoute())
-	app.Get("/player/:id", srv.GetPlayerRoute())
-	app.Get("/players", srv.GetPlayersIDsRoute())
-	app.Get("/players-names", srv.GetPlayerIdsWithNamesRoute())
-	app.Delete("/player/:id", srv.DeletePlayerRoute())
-	app.Post("/player/:playerID/add-item/:itemID", srv.AddItemRoute())
-	app.Delete("/player/add-item/:itemID", srv.DropItemRoute())
-	app.Put("/player/hpmana/:id", srv.ChangeHPandManaRoute())
+	app.Post("/player", routes.CreatePlayerRoute(srv))
+	app.Put("/player/:id", routes.UpdatePlayerRoute(srv))
+	app.Get("/player/:id", routes.GetPlayerRoute(srv))
+	app.Get("/players", routes.GetPlayersIDsRoute(srv))
+	app.Get("/players-names", routes.GetPlayerIdsWithNamesRoute(srv))
+	app.Delete("/player/:id", routes.DeletePlayerRoute(srv))
+	app.Post("/player/:playerID/add-item/:itemID", routes.AddItemRoute(srv))
+	app.Delete("/player/add-item/:itemID", routes.DropItemRoute(srv))
+	app.Put("/player/hpmana/:id", routes.ChangeHPandManaRoute(srv))
 
 	// item
-	app.Post("/item", srv.CreateItemRoute())
-	app.Get("/items", srv.GetItemsIDsRoute())
-	app.Get("/item/:id", srv.GetItemRoute())
-	app.Put("/item/:id", srv.UpdateItemRoute())
-	app.Put("/equip/:id", srv.EquipItemRoute())
-	app.Delete("/item/:id", srv.DeleteItemRoute())
+	app.Post("/item", routes.CreateItemRoute(srv))
+	app.Get("/items", routes.GetItemsIDsRoute(srv))
+	app.Get("/item/:id", routes.GetItemRoute(srv))
+	app.Put("/item/:id", routes.UpdateItemRoute(srv))
+	app.Put("/equip/:id", routes.EquipItemRoute(srv))
+	app.Delete("/item/:id", routes.DeleteItemRoute(srv))
+
+	app.Post("/item/equip", routes.EquipItemRoute(srv))
+	app.Delete("/item/unequip", routes.UnequipItemRoute(srv))
 
 	// bag
-	app.Post("/bag/add/:itemID", srv.AddItemToBagRoute())
-	app.Get("/bag", srv.GetBagRoute())
-	app.Post("/bag/transfer/:itemID/:playerID", srv.TransferItemFromBagRoute())
+	app.Post("/bag/add/:itemID", routes.AddItemToBagRoute(srv))
+	app.Get("/bag", routes.GetBagRoute(srv))
+	app.Post("/bag/transfer/:itemID/:playerID", routes.TransferItemFromBagRoute(srv))
+	app.Delete("/bag/drop/:itemID", routes.DropItemFromBagRoute(srv))
 }

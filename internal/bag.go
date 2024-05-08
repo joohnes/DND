@@ -2,20 +2,9 @@ package internal
 
 // bag of holding
 type Bag struct {
-	Id    int   `json:"-"`
-	Owner int   `json:"owner"`
+	Id int `json:"-"`
+	// Owner int   `json:"owner"`
 	Items []int `json:"items"`
-}
-
-func (srv *Service) GetBagOwner() int {
-	for _, player := range srv.players {
-		for _, item := range player.Items {
-			if item == srv.bag.Id {
-				return player.Id
-			}
-		}
-	}
-	return 0
 }
 
 func (srv *Service) GetBagFromDB() (*Bag, error) {
@@ -37,8 +26,16 @@ func (srv *Service) GetBagFromDB() (*Bag, error) {
 	}
 	bag.Items = items
 	// get bag owner id
-	bag.Owner = srv.GetBagOwner()
 	return bag, nil
+}
+
+func (srv *Service) IsInBag(itemID int) bool {
+	for _, item := range srv.bag.Items {
+		if item == itemID {
+			return true
+		}
+	}
+	return false
 }
 
 func (srv *Service) GetBagID() (int, error) {

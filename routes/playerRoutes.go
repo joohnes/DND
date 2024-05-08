@@ -1,6 +1,7 @@
-package internal
+package routes
 
 import (
+	"dndEq/internal"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -9,9 +10,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (srv *Service) CreatePlayerRoute() func(ctx fiber.Ctx) error {
+func CreatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		var player Player
+		var player internal.Player
 		data := ctx.Body()
 		if err := json.Unmarshal(data, &player); err != nil {
 			return errors.Wrap(err, "CreatePlayerRoute")
@@ -26,34 +27,34 @@ func (srv *Service) CreatePlayerRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) GetPlayerRoute() func(ctx fiber.Ctx) error {
+func GetPlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		id, err := strconv.Atoi(ctx.Params("id"))
 		if err != nil {
-			return errors.Wrap(ErrIDNotNumber, "GetPlayerRoute")
+			return errors.Wrap(internal.ErrIDNotNumber, "GetPlayerRoute")
 		}
 
 		p := srv.GetPlayerByID(id)
 		if p == nil {
-			return errors.Wrap(ErrNoPlayer, "GetPlayerRoute")
+			return errors.Wrap(internal.ErrNoPlayer, "GetPlayerRoute")
 		}
 		return ctx.JSON(p)
 	}
 }
 
-func (srv *Service) GetPlayersIDsRoute() func(ctx fiber.Ctx) error {
+func GetPlayersIDsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		return ctx.JSON(srv.GetPlayersIDs())
 	}
 }
 
-func (srv *Service) GetPlayerIdsWithNamesRoute() func(ctx fiber.Ctx) error {
+func GetPlayerIdsWithNamesRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		return ctx.JSON(srv.GetPlayerIdsWithNames())
 	}
 }
 
-func (srv *Service) AddItemRoute() func(ctx fiber.Ctx) error {
+func AddItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		playerID, err := strconv.Atoi(ctx.Params("playerID"))
 		if err != nil {
@@ -69,7 +70,7 @@ func (srv *Service) AddItemRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) DropItemRoute() func(ctx fiber.Ctx) error {
+func DropItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
@@ -80,9 +81,9 @@ func (srv *Service) DropItemRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) UpdatePlayerRoute() func(ctx fiber.Ctx) error {
+func UpdatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		var player Player
+		var player internal.Player
 		data := ctx.Body()
 		if err := json.Unmarshal(data, &player); err != nil {
 			return errors.Wrap(err, "UpdatePlayerRoute")
@@ -97,14 +98,14 @@ func (srv *Service) UpdatePlayerRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) ChangeHPandManaRoute() func(ctx fiber.Ctx) error {
+func ChangeHPandManaRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		playerID, err := strconv.Atoi(ctx.Params("id"))
 		if err != nil {
 			return errors.Wrap(err, "ChangeHPandManaRoute player id")
 		}
 
-		var hpMana HPMana
+		var hpMana internal.HPMana
 		data := ctx.Body()
 		if err := json.Unmarshal(data, &hpMana); err != nil {
 			return errors.Wrap(err, "ChangeHPandManaRoute")
@@ -119,11 +120,11 @@ func (srv *Service) ChangeHPandManaRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
-func (srv *Service) DeletePlayerRoute() func(ctx fiber.Ctx) error {
+func DeletePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		id, err := strconv.Atoi(ctx.Params("id"))
 		if err != nil {
-			return errors.Wrap(ErrIDNotNumber, "DeletePlayerRoute")
+			return errors.Wrap(internal.ErrIDNotNumber, "DeletePlayerRoute")
 		}
 
 		err = srv.DeletePlayer(id)
