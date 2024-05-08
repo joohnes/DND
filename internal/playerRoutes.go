@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,7 +13,6 @@ func (srv *Service) CreatePlayerRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var player Player
 		data := ctx.Body()
-		fmt.Println(string(data))
 		if err := json.Unmarshal(data, &player); err != nil {
 			return errors.Wrap(err, "CreatePlayerRoute")
 		}
@@ -49,6 +47,12 @@ func (srv *Service) GetPlayersIDsRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
+func (srv *Service) GetPlayerIdsWithNamesRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		return ctx.JSON(srv.GetPlayerIdsWithNames())
+	}
+}
+
 func (srv *Service) AddItemRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		playerID, err := strconv.Atoi(ctx.Params("playerID"))
@@ -67,17 +71,12 @@ func (srv *Service) AddItemRoute() func(ctx fiber.Ctx) error {
 
 func (srv *Service) DropItemRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		playerID, err := strconv.Atoi(ctx.Params("playerID"))
-		if err != nil {
-			return errors.Wrap(err, "DropItemRoute player id")
-		}
-
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
 			return errors.Wrap(err, "DropItemRoute player id")
 		}
 
-		return srv.DropItem(playerID, itemID)
+		return srv.DropItem(itemID)
 	}
 }
 
@@ -95,5 +94,43 @@ func (srv *Service) UpdatePlayerRoute() func(ctx fiber.Ctx) error {
 		}
 
 		return ctx.SendStatus(http.StatusOK)
+	}
+}
+
+func (srv *Service) ChangeHPandManaRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		playerID, err := strconv.Atoi(ctx.Params("id"))
+		if err != nil {
+			return errors.Wrap(err, "ChangeHPandManaRoute player id")
+		}
+
+		var hpMana HPMana
+		data := ctx.Body()
+		if err := json.Unmarshal(data, &hpMana); err != nil {
+			return errors.Wrap(err, "ChangeHPandManaRoute")
+		}
+
+		err = srv.ChangeHPandMana(playerID, hpMana)
+		if err != nil {
+			return errors.Wrap(err, "ChangeHPandManaRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
+	}
+}
+
+func (srv *Service) DeletePlayerRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		id, err := strconv.Atoi(ctx.Params("id"))
+		if err != nil {
+			return errors.Wrap(ErrIDNotNumber, "DeletePlayerRoute")
+		}
+
+		err = srv.DeletePlayer(id)
+		if err != nil {
+			return errors.Wrap(err, "DeletePlayerRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
 	}
 }

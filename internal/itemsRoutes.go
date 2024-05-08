@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -13,7 +12,6 @@ func (srv *Service) CreateItemRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var item Item
 		data := ctx.Body()
-		fmt.Println(string(data))
 		if err := json.Unmarshal(data, &item); err != nil {
 			return errors.Wrap(err, "CreateItemRoute")
 		}
@@ -65,6 +63,22 @@ func (srv *Service) UpdateItemRoute() func(ctx fiber.Ctx) error {
 	}
 }
 
+func (srv *Service) DeleteItemRoute() func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		id, err := strconv.Atoi(ctx.Params("id"))
+		if err != nil {
+			return errors.Wrap(err, "DeleteItemRoute")
+		}
+
+		err = srv.DeleteItem(id)
+		if err != nil {
+			return errors.Wrap(err, "DeleteItemRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
+	}
+}
+
 func (srv *Service) EquipItemRoute() func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
@@ -94,22 +108,12 @@ func (srv *Service) AddItemToBagRoute() func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "AddItemToBagRoute item id")
 		}
 
-		playerID, err := strconv.Atoi(ctx.Params("playerID"))
-		if err != nil {
-			return errors.Wrap(err, "AddItemToBagRoute player id")
-		}
-
-		bagID, err := srv.GetBagID()
+		err = srv.DropItem(itemID)
 		if err != nil {
 			return errors.Wrap(err, "AddItemToBagRoute")
 		}
 
-		err = srv.DropItem(playerID, itemID)
-		if err != nil {
-			return errors.Wrap(err, "AddItemToBagRoute")
-		}
-
-		err = srv.AddItem(bagID, itemID)
+		err = srv.AddItemToBag(itemID)
 		if err != nil {
 			return errors.Wrap(err, "AddItemToBagRoute")
 		}
@@ -130,12 +134,7 @@ func (srv *Service) TransferItemFromBagRoute() func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "TransferItemFromBagRoute player id")
 		}
 
-		bagID, err := srv.GetBagID()
-		if err != nil {
-			return errors.Wrap(err, "TransferItemFromBagRoute")
-		}
-
-		err = srv.DropItem(bagID, itemID)
+		err = srv.DropItemFromBag(itemID)
 		if err != nil {
 			return errors.Wrap(err, "TransferItemFromBagRoute")
 		}

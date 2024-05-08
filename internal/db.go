@@ -84,8 +84,8 @@ func createDB(db *sql.DB) error {
 		return err
 	}
 
-	// table bag of holding
-	query = `CREATE TABLE IF NOT EXISTS bag (
+	// table bag_items
+	query = `CREATE TABLE IF NOT EXISTS bag_items (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		item INTEGER
 		);`

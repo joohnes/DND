@@ -1,5 +1,7 @@
 package internal
 
+import "github.com/pkg/errors"
+
 type Item struct {
 	Id           int    `json:"id"`
 	Name         string `json:"name"`
@@ -48,10 +50,6 @@ func (srv *Service) CreateItem(i Item) (*Item, error) {
 }
 
 func (srv *Service) UpdateItem(i Item) error {
-	if serviceItem := srv.GetItemByID(i.Id); serviceItem != nil {
-		serviceItem = &i
-	}
-
 	query := `UPDATE items
 				SET
 					name=?,
@@ -70,7 +68,10 @@ func (srv *Service) UpdateItem(i Item) error {
 					id=?;
 	`
 	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Id)
-	return err
+	if err != nil {
+		return errors.Wrap(err, "failed to update item")
+	}
+	return srv.ResetObjects(ItemType)
 }
 
 func (srv *Service) EquipItem(id int, owner int) error {
@@ -139,5 +140,8 @@ func (srv *Service) DeleteItem(id int) error {
 	}
 
 	_, err = srv.db.Exec("DELETE FROM player_items WHERE item=?", id)
-	return err
+	if err != nil {
+		return err
+	}
+	return srv.ResetObjects(ItemType)
 }

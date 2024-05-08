@@ -26,18 +26,27 @@ type Player struct {
 	Items        []int  `json:"items"`
 }
 
+type HPMana struct {
+	HP   int `json:"hp"`
+	Mana int `json:"mana"`
+}
+
 func (p *Player) GetItems() []int {
 	return p.Items
 }
 
-func (srv *Service) DropItem(playerID, itemID int) error {
-	p := srv.GetPlayerByID(playerID)
-	for i := 0; i < len(p.Items); i++ {
-		if p.Items[i] == itemID {
-			p.Items[i] = p.Items[len(p.Items)-1]
-			p.Items = p.Items[:len(p.Items)-1]
+func (srv *Service) DropItem(itemID int) error {
+	var playerID int
+	for _, p := range srv.players {
+		for i := 0; i < len(p.Items); i++ {
+			if p.Items[i] == itemID {
+				playerID = p.Id
+				p.Items[i] = p.Items[len(p.Items)-1]
+				p.Items = p.Items[:len(p.Items)-1]
+			}
 		}
 	}
+
 	srv.GetItemByID(itemID).Owner = 0
 
 	query := "DELETE FROM player_items WHERE player=? AND item=?"
@@ -69,6 +78,14 @@ func (srv *Service) GetPlayersIDs() []int {
 	return ids
 }
 
+func (srv *Service) GetPlayerIdsWithNames() map[int]string {
+	players := make(map[int]string)
+	for _, player := range srv.players {
+		players[player.Id] = player.Name
+	}
+	return players
+}
+
 func (srv *Service) GetPlayerByID(id int) *Player {
 	for _, player := range srv.players {
 		if player.Id == id {
@@ -76,6 +93,15 @@ func (srv *Service) GetPlayerByID(id int) *Player {
 		}
 	}
 	return nil
+}
+
+func (srv *Service) ChangeHPandMana(id int, hpmana HPMana) error {
+	query := "UPDATE players SET health=?, mana=? WHERE id=?"
+	_, err := srv.db.Exec(query, hpmana.HP, hpmana.Mana, id)
+	if err != nil {
+		return errors.Wrap(err, "query: failed to change hp and mana")
+	}
+	return errors.Wrap(srv.ResetObjects(PlayerType), "failed to change hp and mana")
 }
 
 func (srv *Service) CreatePlayer(p Player) (*Player, error) {
@@ -90,15 +116,10 @@ func (srv *Service) CreatePlayer(p Player) (*Player, error) {
 }
 
 func (srv *Service) UpdatePlayer(p Player) error {
-	if player := srv.GetPlayerByID(p.Id); player != nil {
-		player = &p
-	}
 	query := `UPDATE players
 				SET
 					name=?,
 					level=?,
-					health=?,
-					mana=?,
 					class=?,
 					race=?,
 					subrace=?,
@@ -114,7 +135,10 @@ func (srv *Service) UpdatePlayer(p Player) error {
 					id=?;
 	`
 	_, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.Session, p.Id)
-	return err
+	if err != nil {
+		return errors.Wrap(err, "failed to update player")
+	}
+	return srv.ResetObjects(PlayerType)
 }
 
 func (srv *Service) DeletePlayer(id int) error {
@@ -123,7 +147,10 @@ func (srv *Service) DeletePlayer(id int) error {
 		return err
 	}
 	_, err = srv.db.Exec("DELETE FROM player_items WHERE player=?", id)
-	return err
+	if err != nil {
+		return err
+	}
+	return srv.ResetObjects(PlayerType)
 }
 
 func (srv *Service) GetPlayersFromDB() ([]*Player, error) {

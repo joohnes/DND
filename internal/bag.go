@@ -2,9 +2,9 @@ package internal
 
 // bag of holding
 type Bag struct {
-	Id    int     `json:"-"`
-	Owner int     `json:"owner"`
-	Items []*Item `json:"items"`
+	Id    int   `json:"-"`
+	Owner int   `json:"owner"`
+	Items []int `json:"items"`
 }
 
 func (srv *Service) GetBagOwner() int {
@@ -19,7 +19,7 @@ func (srv *Service) GetBagOwner() int {
 }
 
 func (srv *Service) GetBagFromDB() (*Bag, error) {
-	query := "SELECT item FROM bag"
+	query := "SELECT item FROM bag_items"
 	rows, err := srv.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -35,12 +35,7 @@ func (srv *Service) GetBagFromDB() (*Bag, error) {
 		}
 		items = append(items, itemID)
 	}
-
-	for _, itemID := range items {
-		i := srv.GetItemByID(itemID)
-		bag.Items = append(bag.Items, i)
-	}
-
+	bag.Items = items
 	// get bag owner id
 	bag.Owner = srv.GetBagOwner()
 	return bag, nil
@@ -58,4 +53,49 @@ func (srv *Service) GetBagID() (int, error) {
 
 func (srv *Service) GetBag() *Bag {
 	return srv.bag
+}
+
+func (bag *Bag) IsItemInBag(id int) bool {
+	for _, item := range bag.Items {
+		if item == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (srv *Service) DropItemFromBag(itemID int) error {
+	if !srv.bag.IsItemInBag(itemID) {
+		return ErrItemNotFound
+	}
+	query := "DELETE FROM bag_items WHERE item=?"
+	_, err := srv.db.Exec(query, itemID)
+	if err != nil {
+		return err
+	}
+
+	// bag := srv.GetBag()
+	// for i := 0; i < len(bag.Items); i++ {
+	// 	if bag.Items[i] == itemID {
+	// 		bag.Items[i] = bag.Items[len(bag.Items)-1]
+	// 		bag.Items = bag.Items[:len(bag.Items)-1]
+	// 	}
+	// }
+	return srv.ResetObjects(BagType)
+}
+
+func (srv *Service) AddItemToBag(itemID int) error {
+	if srv.bag.IsItemInBag(itemID) {
+		return ErrItemAlreadyExists
+	}
+	query := "INSERT INTO bag_items (item) VALUES (?)"
+	_, err := srv.db.Exec(query, itemID)
+	if err != nil {
+		return err
+	}
+
+	// bag := srv.GetBag()
+	// bag.Items = append(bag.Items, id)
+
+	return srv.ResetObjects(BagType)
 }
