@@ -22,7 +22,7 @@ type Player struct {
 	Agility      int    `json:"agility"`
 	Accuracy     int    `json:"accuracy"`
 	Charisma     int    `json:"charisma"`
-	Session      int    `json:"session"`
+	Session      int    `json:"-"`
 	Items        []int  `json:"items"`
 }
 
@@ -47,8 +47,6 @@ func (srv *Service) DropItem(itemID int) error {
 		}
 	}
 
-	srv.GetItemByID(itemID).Owner = 0
-
 	query := "DELETE FROM player_items WHERE player=? AND item=?"
 	_, err := srv.db.Exec(query, playerID, itemID)
 	return errors.Wrap(err, "failed to drop item")
@@ -65,7 +63,6 @@ func (srv *Service) AddItem(playerID, itemID int) error {
 		return errors.New("player with given id not found")
 	}
 	player.Items = append(player.Items, itemID)
-	srv.GetItemByID(itemID).Owner = playerID
 
 	return nil
 }

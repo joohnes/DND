@@ -9,4 +9,5 @@ var (
 	ErrIDNotNumber       = errors.New("id must be numerical")
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyExists = errors.New("item already exists")
+	ErrInvalidRarity     = errors.New("invalid rarity")
 )

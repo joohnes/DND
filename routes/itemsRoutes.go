@@ -17,6 +17,11 @@ func CreateItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "CreateItemRoute")
 		}
 
+		err := internal.IsValidRarity(item.Rarity)
+		if err != nil {
+			return errors.Wrap(err, "CreateItemRoute")
+		}
+
 		i, err := srv.CreateItem(item)
 		if err != nil {
 			return errors.Wrap(err, "CreateItemRoute")

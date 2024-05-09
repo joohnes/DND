@@ -1,21 +1,34 @@
 package internal
 
+import (
+	"database/sql"
+	"errors"
+)
+
 // bag of holding
 type Bag struct {
-	Id int `json:"-"`
-	// Owner int   `json:"owner"`
-	Items []int `json:"items"`
+	Id     int   `json:"-"`
+	Holder int   `json:"-"`
+	Items  []int `json:"items"`
 }
 
 func (srv *Service) GetBagFromDB() (*Bag, error) {
-	query := "SELECT item FROM bag_items"
+	var items []int
+	bag := &Bag{}
+	var holder int
+
+	query := "SELECT holder FROM bag_items LIMIT 1"
+	err := srv.db.QueryRow(query).Scan(&holder)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	query = "SELECT item FROM bag_items"
 	rows, err := srv.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []int
-	bag := &Bag{}
 
 	for rows.Next() {
 		var itemID int
@@ -24,18 +37,10 @@ func (srv *Service) GetBagFromDB() (*Bag, error) {
 		}
 		items = append(items, itemID)
 	}
+	bag.Holder = holder
 	bag.Items = items
-	// get bag owner id
-	return bag, nil
-}
 
-func (srv *Service) IsInBag(itemID int) bool {
-	for _, item := range srv.bag.Items {
-		if item == itemID {
-			return true
-		}
-	}
-	return false
+	return bag, nil
 }
 
 func (srv *Service) GetBagID() (int, error) {
@@ -61,6 +66,25 @@ func (bag *Bag) IsItemInBag(id int) bool {
 	return false
 }
 
+func (srv *Service) GetBagHolderName() string {
+	for _, p := range srv.players {
+		if p.Id == srv.bag.Holder {
+			return p.Name
+		}
+	}
+	return ""
+}
+
+func (srv *Service) ChangeBagHolder(playerID int) error {
+	query := "UPDATE bag_items SET holder=?"
+	_, err := srv.db.Exec(query, playerID)
+	if err != nil {
+		return err
+	}
+	srv.bag.Holder = playerID
+	return srv.ResetObjects(BagType)
+}
+
 func (srv *Service) DropItemFromBag(itemID int) error {
 	if !srv.bag.IsItemInBag(itemID) {
 		return ErrItemNotFound
@@ -71,13 +95,6 @@ func (srv *Service) DropItemFromBag(itemID int) error {
 		return err
 	}
 
-	// bag := srv.GetBag()
-	// for i := 0; i < len(bag.Items); i++ {
-	// 	if bag.Items[i] == itemID {
-	// 		bag.Items[i] = bag.Items[len(bag.Items)-1]
-	// 		bag.Items = bag.Items[:len(bag.Items)-1]
-	// 	}
-	// }
 	return srv.ResetObjects(BagType)
 }
 
@@ -85,14 +102,11 @@ func (srv *Service) AddItemToBag(itemID int) error {
 	if srv.bag.IsItemInBag(itemID) {
 		return ErrItemAlreadyExists
 	}
-	query := "INSERT INTO bag_items (item) VALUES (?)"
+	query := "INSERT INTO bag_items (item, holder) VALUES (?, 0)"
 	_, err := srv.db.Exec(query, itemID)
 	if err != nil {
 		return err
 	}
-
-	// bag := srv.GetBag()
-	// bag.Items = append(bag.Items, id)
 
 	return srv.ResetObjects(BagType)
 }

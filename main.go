@@ -42,7 +42,7 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Get("/players-names", routes.GetPlayerIdsWithNamesRoute(srv))
 	app.Delete("/player/:id", routes.DeletePlayerRoute(srv))
 	app.Post("/player/:playerID/add-item/:itemID", routes.AddItemRoute(srv))
-	app.Delete("/player/add-item/:itemID", routes.DropItemRoute(srv))
+	app.Delete("/player/drop-item/:itemID", routes.DropItemRoute(srv))
 	app.Put("/player/hpmana/:id", routes.ChangeHPandManaRoute(srv))
 
 	// item
@@ -61,4 +61,6 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Get("/bag", routes.GetBagRoute(srv))
 	app.Post("/bag/transfer/:itemID/:playerID", routes.TransferItemFromBagRoute(srv))
 	app.Delete("/bag/drop/:itemID", routes.DropItemFromBagRoute(srv))
+	app.Get("/bag/holder", routes.GetBagHolderRoute(srv))
+	app.Post("/bag/holder", routes.ChangeBagHolderRoute(srv))
 }

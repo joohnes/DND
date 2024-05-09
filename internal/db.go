@@ -56,7 +56,7 @@ func createDB(db *sql.DB) error {
 		name TEXT,
 		description TEXT,
 		ability TEXT,
-		rarity INTEGER,
+		rarity TEXT,
 		strength INTEGER,
 		endurance INTEGER,
 		perception INTEGER,
@@ -87,6 +87,7 @@ func createDB(db *sql.DB) error {
 	// table bag_items
 	query = `CREATE TABLE IF NOT EXISTS bag_items (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		holder INTEGER,
 		item INTEGER
 		);`
 	_, err = tx.Exec(query)

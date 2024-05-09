@@ -2,6 +2,7 @@ package routes
 
 import (
 	"dndEq/internal"
+	"encoding/json"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -71,6 +72,30 @@ func DropItemFromBagRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		err = srv.DropItemFromBag(itemID)
 		if err != nil {
 			return errors.Wrap(err, "DropItemFromBagRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
+	}
+}
+
+func GetBagHolderRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		return ctx.JSON(srv.GetBagHolderName())
+	}
+
+}
+
+func ChangeBagHolderRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		var playerID int
+		data := ctx.Body()
+		if err := json.Unmarshal(data, &playerID); err != nil {
+			return errors.Wrap(err, "ChangeBagHolderRoute")
+		}
+
+		err := srv.ChangeBagHolder(playerID)
+		if err != nil {
+			return errors.Wrap(err, "ChangeBagHolderRoute")
 		}
 
 		return ctx.SendStatus(fiber.StatusOK)

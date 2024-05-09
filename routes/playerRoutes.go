@@ -38,6 +38,7 @@ func GetPlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		if p == nil {
 			return errors.Wrap(internal.ErrNoPlayer, "GetPlayerRoute")
 		}
+
 		return ctx.JSON(p)
 	}
 }

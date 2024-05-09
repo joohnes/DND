@@ -7,7 +7,7 @@ type Item struct {
 	Name         string `json:"name"`
 	Description  string `json:"description"`
 	Ability      string `json:"ability"`
-	Rarity       int    `json:"rarity"`
+	Rarity       string `json:"rarity"`
 	Strength     int    `json:"strength"`
 	Endurance    int    `json:"endurance"`
 	Perception   int    `json:"perception"`
@@ -17,6 +17,14 @@ type Item struct {
 	Charisma     int    `json:"charisma"`
 	Quantity     int    `json:"quantity"`
 	Equipped     int    `json:"equipped"`
+}
+
+func IsValidRarity(rarity string) error {
+	switch rarity {
+	case "Common", "Rare", "Epic", "Legendary", "Artefact":
+		return nil
+	}
+	return ErrInvalidRarity
 }
 
 func (srv *Service) GetItemByID(id int) *Item {
@@ -31,7 +39,7 @@ func (srv *Service) GetItemByID(id int) *Item {
 func (srv *Service) GetItemsIDs() []int {
 	var ids []int
 	for _, i := range srv.items {
-		if srv.IsInBag(i.Id) {
+		if srv.bag.IsItemInBag(i.Id) {
 			continue
 		}
 		ids = append(ids, i.Id)
@@ -40,8 +48,8 @@ func (srv *Service) GetItemsIDs() []int {
 }
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {
-	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, equipped, isbag) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, false, false)
+	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, equipped) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, false)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +144,6 @@ func (srv *Service) GetItemsFromDB() ([]*Item, error) {
 			&i.Quantity,
 		)
 
-		i.Owner = playerItems[i.Id]
 		items = append(items, i)
 	}
 
