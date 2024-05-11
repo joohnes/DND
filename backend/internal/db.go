@@ -2,7 +2,9 @@ package internal
 
 import (
 	"database/sql"
+	"log"
 
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -13,10 +15,35 @@ const (
 )
 
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", database)
-	if err != nil {
-		return nil, err
+	cfg := NewCfg()
+	var db *sql.DB
+	var err error
+
+	if cfg.Production {
+		dbCfg := mysql.Config{
+			User:   cfg.DBUsername,
+			Passwd: cfg.DBPassword,
+			Net:    "tcp",
+			Addr:   cfg.DBAdress,
+			DBName: cfg.DBName,
+		}
+
+		db, err = sql.Open("mysql", dbCfg.FormatDSN())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		pingErr := db.Ping()
+		if pingErr != nil {
+			panic(pingErr)
+		}
+	} else {
+		db, err = sql.Open("sqlite3", database)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	err = createDB(db)
 	return db, err
 }
@@ -87,7 +114,6 @@ func createDB(db *sql.DB) error {
 	// table bag_items
 	query = `CREATE TABLE IF NOT EXISTS bag_items (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		holder INTEGER,
 		item INTEGER
 		);`
 	_, err = tx.Exec(query)
@@ -95,11 +121,20 @@ func createDB(db *sql.DB) error {
 		return err
 	}
 
-	// // create basic bag of holding
-	// if tx.QueryRow(`SELECT * FROM items WHERE isbag = true;`).Scan(nil) == sql.ErrNoRows {
-	// 	query = `INSERT INTO items (name, isbag) VALUES (?, ?);`
-	// 	_, _ = tx.Exec(query, "Bag of Holding", true)
-	// }
+	query = `CREATE TABLE IF NOT EXISTS settings (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,
+		value TEXT
+		)`
+	_, err = tx.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	// create holder in settings
+	if tx.QueryRow(`SELECT name FROM settings WHERE name = 'bag_holder';`).Scan(nil) == sql.ErrNoRows {
+		_, _ = tx.Exec(`INSERT INTO settings (name, value) VALUES (?, ?)`, "bag_holder", "0")
+	}
 
 	// create basic player
 	var name string

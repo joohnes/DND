@@ -6,6 +6,7 @@
   	import { HOST } from "$lib/host";
 
     let holder: string;
+	let names: [string, unknown][] | null;
 	let bagItems = writable([]);
 	onMount(async () => {
 		{
@@ -18,22 +19,21 @@
 			const data = await res.json()
 			holder = data
 		}
+		GetPlayerNames()
 	});
 
 	async function ChangeHolder(id: string) {
 		await fetch(HOST + "bag/holder", {
 			method: "POST",
-			body: JSON.stringify(id)
+			body: JSON.stringify(parseInt(id))
 		})
 	}
 
-	let names: [string, unknown][] | null;
 	async function GetPlayerNames() {
 				const res = await fetch(HOST + 'players-names');
 				const data = await res.json();
 				names = Object.entries(data)
 	}
-	GetPlayerNames()
 
 	let showModal = false;
 </script>
