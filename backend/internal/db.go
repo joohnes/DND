@@ -19,14 +19,13 @@ func ConnectDB() (*sql.DB, error) {
 	var db *sql.DB
 	var err error
 
+	dbCfg := mysql.NewConfig()
+
 	if cfg.Production {
-		dbCfg := mysql.Config{
-			User:   cfg.DBUsername,
-			Passwd: cfg.DBPassword,
-			Net:    "tcp",
-			Addr:   cfg.DBAdress,
-			DBName: cfg.DBName,
-		}
+		dbCfg.User = cfg.DBUsername
+		dbCfg.Passwd = cfg.DBPassword
+		dbCfg.Addr = cfg.DBAdress
+		dbCfg.DBName = cfg.DBName
 
 		db, err = sql.Open("mysql", dbCfg.FormatDSN())
 		if err != nil {
