@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -23,7 +24,7 @@ func NewCfg() *config {
 	}
 	err := godotenv.Load()
 	if err != nil {
-		panic("Error loading .env file")
+		panic(fmt.Sprintf("Error loading .env file %s", err))
 	}
 	newCfg := &config{
 		Production: os.Getenv("PRODUCTION") == "true",
