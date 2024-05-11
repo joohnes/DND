@@ -17,7 +17,7 @@
         charisma: parseInt(formData.get("charisma")!.toString())
       }
 
-      fetch(window.location.origin.replace("5173", "8000") + "/player", {
+      fetch(HOST + "/player", {
         method: "POST",
         body: JSON.stringify(p)
       })

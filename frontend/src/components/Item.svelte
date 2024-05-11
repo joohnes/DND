@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Modal from "./Modal.svelte"
+	import { HOST } from './host';
 
 	let i: Item;
 	onMount(async function () {
-		const res = await fetch(window.location.origin.replace("5173", "8000") + '/item/' + id);
+		const res = await fetch(HOST + '/item/' + id);
 		const data = await res.json();
 		i = {
 			id: data.id,
@@ -25,40 +26,40 @@
 
 	async function Drop() {
 		if (!playerView) {
-			await fetch(window.location.origin.replace("5173", "8000") + "/bag/drop/" + i.id, {
+			await fetch(HOST + "/bag/drop/" + i.id, {
 				method: "DELETE",
 			})
 			window.location.reload()
 		} else {
-			await fetch(window.location.origin.replace("5173", "8000") + "/player/drop-item/" + i.id, {
+			await fetch(HOST + "/player/drop-item/" + i.id, {
 				method: "DELETE",
 			})
 			window.location.href = window.location.origin + "/players"
 		}
 	}
 	async function DeleteItem() {
-		await fetch(window.location.origin.replace("5173", "8000") + "/item/" + i.id, {
+		await fetch(HOST + "/item/" + i.id, {
         method: "DELETE",
 		})
 		window.location.reload()
 	}
 
 	async function TransferItemToBag() {
-		await fetch(window.location.origin.replace("5173", "8000") + "/bag/add/" + i.id, {
+		await fetch(HOST + "/bag/add/" + i.id, {
 			method: "POST",
 		})
 		window.location.reload()
 	}
 
 	async function TransferItemToPlayer(id: string) {
-		await fetch(window.location.origin.replace("5173", "8000") + "/bag/transfer/" + i.id + "/" + id, {
+		await fetch(HOST + "/bag/transfer/" + i.id + "/" + id, {
 			method: "POST",
 		})
 		window.location.reload()
 	}
 
 	async function AddItemToPlayer(id: string) {
-		await fetch(window.location.origin.replace("5173", "8000") + "/player/" + id + "/add-item/" + i.id, {
+		await fetch(HOST + "/player/" + id + "/add-item/" + i.id, {
 			method: "POST",
 		})
 		window.location.reload()

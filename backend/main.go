@@ -30,7 +30,7 @@ func main() {
 	register(app, srv)
 
 	var port string
-	flag.StringVar(&port, "port", "20302", "port to listen on")
+	flag.StringVar(&port, "port", "8000", "port to listen on")
 
 	if err := app.Listen(fmt.Sprintf(":%s", port)); err != nil {
 		log.Error(err.Error())

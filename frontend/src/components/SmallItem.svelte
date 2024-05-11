@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 	import Modal from "./Modal.svelte"
-	const host = 'http://localhost:8000/';
+	import { HOST } from './host';
 
 	let i: Item;
 	onMount(async function () {
-		const res = await fetch(host + 'item/' + id);
+		const res = await fetch(HOST + 'item/' + id);
 		const data = await res.json();
 		i = {
 			id: data.id,

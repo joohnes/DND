@@ -17,7 +17,7 @@
         quantity: parseInt(formData.get("quantity")!.toString()),
       }
 
-      fetch(window.location.origin.replace("5173", "8000") + "/item", {
+      fetch(HOST + "/item", {
         method: "POST",
         body: JSON.stringify(i),
       })

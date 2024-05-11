@@ -3,24 +3,25 @@
 	import { writable } from 'svelte/store';
 	import Item from '../../components/Item.svelte';
 	import Modal from '../../components/Modal.svelte';
+	import { HOST } from '../../components/host';
 
     let holder: string;
 	let bagItems = writable([]);
 	onMount(async () => {
 		{
-			const  res = await fetch(window.location.origin.replace("5173", "8000") + '/bag');
-			const  data = await res.json();
+			const res = await fetch(HOST + "bag");
+			const data = await res.json();
 			bagItems.set(data.items);
 		}
 		{
-			const res = await fetch(window.location.origin.replace("5173", "8000") + "/bag/holder")
+			const res = await fetch(HOST + "bag/holder")
 			const data = await res.json()
 			holder = data
 		}
 	});
 
 	async function ChangeHolder(id: string) {
-		await fetch(window.location.origin.replace("5173", "8000") + "/bag/holder", {
+		await fetch(HOST + "bag/holder", {
 			method: "POST",
 			body: JSON.stringify(id)
 		})
@@ -28,7 +29,7 @@
 
 	let names: [string, unknown][] | null;
 	async function GetPlayerNames() {
-				const res = await fetch('http://localhost:8000/players-names');
+				const res = await fetch(HOST + 'players-names');
 				const data = await res.json();
 				names = Object.entries(data)
 	}

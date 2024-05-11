@@ -3,12 +3,12 @@
 	import Modal from './Modal.svelte'
 	import SmallItem from './SmallItem.svelte';
 	import { writable } from 'svelte/store';
-	const host = 'http://localhost:8000/';
+	import { HOST } from './host';
 
 	let p: Player;
 	let items = writable([])
 	onMount(async function () {
-		const res = await fetch(host + 'player/' + id);
+		const res = await fetch(HOST + 'player/' + id);
 		const data = await res.json();
 		p = {
 			id: data.id,
@@ -37,7 +37,7 @@
 			hp: hp,
 			mana: mana,
 		}
-		fetch(window.location.origin.replace("5173", "8000") + "/player/hpmana/" + p.id, {
+		fetch(HOST + "/player/hpmana/" + p.id, {
         method: "PUT",
         body: JSON.stringify(data)
       })
@@ -45,7 +45,7 @@
 	}
 
 	async function DeletePlayer() {
-		fetch(window.location.origin.replace("5173", "8000") + "/player/" + p.id, {
+		fetch(HOST + "/player/" + p.id, {
         method: "DELETE",
 		})
 		window.location.href = window.location.origin + "/players"

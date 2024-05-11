@@ -22,7 +22,7 @@
         charisma: parseInt(formData.get("charisma")!.toString())
       }
 
-      fetch(window.location.origin.replace("5173", "8000") + "/player/" + id, {
+      fetch(HOST + "/player/" + id, {
         method: "PUT",
         body: JSON.stringify(p)
       })
@@ -30,7 +30,7 @@
     }
     let p: Player;
     onMount(async function () {
-		const res = await fetch(window.location.origin.replace("5173", "8000") + '/player/' + id);
+		const res = await fetch(HOST + '/player/' + id);
 		const data = await res.json();
 		p = {
 			id: data.id,
