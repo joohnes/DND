@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log/slog"
 
 	"github.com/gofiber/fiber/v3"
@@ -27,7 +29,10 @@ func main() {
 	// srv.TestObjects()
 	register(app, srv)
 
-	if err := app.Listen(":8000"); err != nil {
+	var port string
+	flag.StringVar(&port, "port", "20302", "port to listen on")
+
+	if err := app.Listen(fmt.Sprintf(":%s", port)); err != nil {
 		log.Error(err.Error())
 		return
 	}
