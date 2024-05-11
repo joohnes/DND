@@ -1,0 +1,6 @@
+.env config
+`PRODUCTION=false
+DBUSER=
+DBPASS=
+DBADDR=
+DBNAME=`

@@ -3,6 +3,7 @@ package internal
 import (
 	"database/sql"
 	"errors"
+	"strconv"
 )
 
 // bag of holding
@@ -15,11 +16,17 @@ type Bag struct {
 func (srv *Service) GetBagFromDB() (*Bag, error) {
 	var items []int
 	bag := &Bag{}
+	var tmp string
 	var holder int
 
-	query := "SELECT holder FROM bag_items LIMIT 1"
-	err := srv.db.QueryRow(query).Scan(&holder)
+	query := "SELECT value FROM settings WHERE name='bag_holder'"
+	err := srv.db.QueryRow(query).Scan(&tmp)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	holder, err = strconv.Atoi(tmp)
+	if err != nil {
 		return nil, err
 	}
 
@@ -76,7 +83,7 @@ func (srv *Service) GetBagHolderName() string {
 }
 
 func (srv *Service) ChangeBagHolder(playerID int) error {
-	query := "UPDATE bag_items SET holder=?"
+	query := "UPDATE settings SET value=? WHERE name='bag_holder'"
 	_, err := srv.db.Exec(query, playerID)
 	if err != nil {
 		return err
@@ -102,7 +109,7 @@ func (srv *Service) AddItemToBag(itemID int) error {
 	if srv.bag.IsItemInBag(itemID) {
 		return ErrItemAlreadyExists
 	}
-	query := "INSERT INTO bag_items (item, holder) VALUES (?, 0)"
+	query := "INSERT INTO bag_items (item) VALUES (?)"
 	_, err := srv.db.Exec(query, itemID)
 	if err != nil {
 		return err
