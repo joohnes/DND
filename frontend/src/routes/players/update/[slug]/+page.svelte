@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+  import { HOST } from "$lib/host";
+  
     /** @type {import('./$types').PageData} */
     export let data;
     const id = data.data

@@ -3,7 +3,7 @@
 	import { writable } from 'svelte/store';
 	import Item from '../../components/Item.svelte';
 	import Modal from '../../components/Modal.svelte';
-	import { HOST } from '../../components/host';
+  	import { HOST } from "$lib/host";
 
     let holder: string;
 	let bagItems = writable([]);

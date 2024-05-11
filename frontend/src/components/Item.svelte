@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Modal from "./Modal.svelte"
-	import { HOST } from './host';
+  	import { HOST } from "$lib/host";
 
 	let i: Item;
 	onMount(async function () {

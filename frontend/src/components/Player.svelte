@@ -3,7 +3,7 @@
 	import Modal from './Modal.svelte'
 	import SmallItem from './SmallItem.svelte';
 	import { writable } from 'svelte/store';
-	import { HOST } from './host';
+  	import { HOST } from "$lib/host";
 
 	let p: Player;
 	let items = writable([])

@@ -1,9 +1,10 @@
 <script lang="ts">
-	import Player from '../components/Player.svelte';
-import Menu from '../components/menu.svelte';
-	const host = 'http://localhost:8000/';
+	import { onMount } from "svelte";
+
+	onMount(()=>{
+		window.location.href = window.location.origin + "/players"
+	})
 </script>
 
 <main>
-	<Player id={1}/>
 </main>

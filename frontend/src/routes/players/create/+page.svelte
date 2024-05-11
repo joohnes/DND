@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { HOST } from "$lib/host";
+  
   const sendData = (e: any) => {
       let p: Player
       const formData = new FormData(e.target)
