@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
   import { HOST } from "$lib/host";
-  
+
     /** @type {import('./$types').PageData} */
     export let data;
     const id = data.data
@@ -24,7 +24,7 @@
         charisma: parseInt(formData.get("charisma")!.toString())
       }
 
-      fetch(HOST + "/player/" + id, {
+      fetch(HOST + "player/" + id, {
         method: "PUT",
         body: JSON.stringify(p)
       })
@@ -32,7 +32,7 @@
     }
     let p: Player;
     onMount(async function () {
-		const res = await fetch(HOST + '/player/' + id);
+		const res = await fetch(HOST + 'player/' + id);
 		const data = await res.json();
 		p = {
 			id: data.id,

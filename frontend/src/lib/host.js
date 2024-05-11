@@ -1,1 +1,1 @@
-export let HOST = 'http://localhost:8000/';
+export let HOST = '/api/';

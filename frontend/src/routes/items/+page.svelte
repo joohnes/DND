@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Item from '../../components/Item.svelte';
+	import { HOST } from '$lib/host';
 
 	let items = writable([]);
 	onMount(async () => {
-		const res = await fetch('http://localhost:8000/items');
+		const res = await fetch(HOST + 'items');
 		const data = await res.json();
 		items.set(data);
 	});

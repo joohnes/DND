@@ -37,7 +37,7 @@
 			hp: hp,
 			mana: mana,
 		}
-		fetch(HOST + "/player/hpmana/" + p.id, {
+		fetch(HOST + "player/hpmana/" + p.id, {
         method: "PUT",
         body: JSON.stringify(data)
       })
@@ -45,7 +45,7 @@
 	}
 
 	async function DeletePlayer() {
-		fetch(HOST + "/player/" + p.id, {
+		fetch(HOST + "player/" + p.id, {
         method: "DELETE",
 		})
 		window.location.href = window.location.origin + "/players"

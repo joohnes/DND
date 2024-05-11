@@ -19,7 +19,7 @@
         quantity: parseInt(formData.get("quantity")!.toString()),
       }
 
-      fetch(HOST + "/item", {
+      fetch(HOST + "item", {
         method: "POST",
         body: JSON.stringify(i),
       })

@@ -5,7 +5,7 @@
 
 	let i: Item;
 	onMount(async function () {
-		const res = await fetch(HOST + '/item/' + id);
+		const res = await fetch(HOST + 'item/' + id);
 		const data = await res.json();
 		i = {
 			id: data.id,
@@ -26,40 +26,40 @@
 
 	async function Drop() {
 		if (!playerView) {
-			await fetch(HOST + "/bag/drop/" + i.id, {
+			await fetch(HOST + "bag/drop/" + i.id, {
 				method: "DELETE",
 			})
 			window.location.reload()
 		} else {
-			await fetch(HOST + "/player/drop-item/" + i.id, {
+			await fetch(HOST + "player/drop-item/" + i.id, {
 				method: "DELETE",
 			})
 			window.location.href = window.location.origin + "/players"
 		}
 	}
 	async function DeleteItem() {
-		await fetch(HOST + "/item/" + i.id, {
+		await fetch(HOST + "item/" + i.id, {
         method: "DELETE",
 		})
 		window.location.reload()
 	}
 
 	async function TransferItemToBag() {
-		await fetch(HOST + "/bag/add/" + i.id, {
+		await fetch(HOST + "bag/add/" + i.id, {
 			method: "POST",
 		})
 		window.location.reload()
 	}
 
 	async function TransferItemToPlayer(id: string) {
-		await fetch(HOST + "/bag/transfer/" + i.id + "/" + id, {
+		await fetch(HOST + "bag/transfer/" + i.id + "/" + id, {
 			method: "POST",
 		})
 		window.location.reload()
 	}
 
 	async function AddItemToPlayer(id: string) {
-		await fetch(HOST + "/player/" + id + "/add-item/" + i.id, {
+		await fetch(HOST + "player/" + id + "/add-item/" + i.id, {
 			method: "POST",
 		})
 		window.location.reload()
@@ -67,7 +67,7 @@
 	
 	let names: [string, unknown][] | null;
 	async function GetPlayerNames() {
-				const res = await fetch('http://localhost:8000/players-names');
+				const res = await fetch(HOST + 'players-names');
 				const data = await res.json();
 				names = Object.entries(data)
 	}

@@ -24,7 +24,7 @@
         quantity: parseInt(formData.get("quantity")!.toString())
       }
 
-      fetch(HOST + "/item/" + id, {
+      fetch(HOST + "item/" + id, {
         method: "PUT",
         body: JSON.stringify(i)
       })
@@ -32,7 +32,7 @@
     }
     let i: Item;
     onMount(async function () {
-      const res = await fetch(HOST + '/item/' + id);
+      const res = await fetch(HOST + 'item/' + id);
       const data = await res.json();
       i = {
         id: data.id,
