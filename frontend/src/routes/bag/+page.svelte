@@ -11,7 +11,9 @@
 	var menuItem: HTMLElement
 	onMount(async () => {
 		menuItem = document.getElementById("menu-bag")!
-		menuItem.classList.remove("btn-outline")
+		if (menuItem != undefined) {
+			menuItem.classList.remove("btn-outline")
+		}
 		{
 			const res = await fetch(HOST + "bag");
 			const data = await res.json();
@@ -26,7 +28,9 @@
 	});
 
 	onDestroy(() => {
-		menuItem.classList.add("btn-outline")
+		if (menuItem != undefined) {
+			menuItem.classList.add("btn-outline")
+		}
 	})
 
 	const ChangeHolder = (e: any) => {

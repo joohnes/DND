@@ -149,7 +149,7 @@
 	.player {
 		display: flex;
 		flex-direction: column;
-		width: 15rem;
+		width: 20rem;
 		justify-content: space-between;
 		padding: 1rem;
 		border: 3px solid;
