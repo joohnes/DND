@@ -1,5 +1,17 @@
 <script lang="ts">
   import { HOST } from "$lib/host";
+  import { onMount, onDestroy } from 'svelte';
+
+  var menuItem: HTMLElement
+  onMount(()=> {
+    menuItem = document.getElementById("menu-players-create")!
+		menuItem.classList.remove("btn-outline")
+
+  })
+
+  onDestroy(() => {
+		menuItem.classList.add("btn-outline")
+	})
 
   const sendData = (e: any) => {
       let p: Player
@@ -27,94 +39,83 @@
     }
 
 </script>
-
-<form class="form-horizontal" on:submit|preventDefault={sendData}>
-    <fieldset>
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="name">Name</label>  
-      <div class="col-md-4">
-      <input id="name" name="name" type="text" class="form-control input-md">
-      </div>
-    </div>
+<div class="h-screen my-auto items-center py-1 px-8 m-2 flex flex-col drop-shadow-xl">
+<form on:submit|preventDefault={sendData}>
+    <fieldset class="border border-slate-900 rounded-lg p-5 shadow-2xl">
+      <div class="flex gap-20">
+        <div>
+          <label  for="name">Name</label>  
+          <div>
+           <input id="name" name="name" type="text" class="input input-bordered w-full max-w-md">
+          </div>
     
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="level">Level</label>  
-      <div class="col-md-4">
-      <input id="level" name="level" type="number" class="form-control input-md">
+          <label class="" for="level">Level</label>  
+          <div>
+            <input id="level" name="level" type="number" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+          <label class="" for="class">Class</label>
+          <div>
+            <input id="class" name="class" type="text" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="race">Race</label>
+          <div >
+            <input id="race" name="race" type="text" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="subrace">Subrace</label>
+          <div >
+            <input id="subrace" name="subrace" type="text" class="input input-bordered w-full max-w-xs">
+          </div>
+        </div>
+        <div>
+          <label  for="strength">Strength</label>  
+          <div >
+            <input id="strength" name="strength" type="number" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="endurance">Endurance</label>  
+          <div >
+            <input id="endurance" name="endurance" type="number" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="perception">Perception</label>  
+          <div >
+            <input id="perception" name="perception" type="number" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="intelligence">Intelligence</label>  
+          <div >
+          <input id="intelligence" name="intelligence" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="agility">Agility</label>  
+          <div >
+          <input id="agility" name="agility" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="accuracy">Accuracy</label>  
+          <div >
+          <input id="accuracy" name="accuracy" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+          </div>
+        
+        
+          <label  for="charisma">Charisma</label>  
+          <div >
+          <input id="charisma" name="charisma" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+          </div>
+        </div>
       </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="class">Class</label>
-      <div class="col-md-4">
-        <input id="class" name="class" type="text" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="race">Race</label>
-      <div class="col-md-4">
-        <input id="race" name="race" type="text" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="subrace">Subrace</label>
-      <div class="col-md-4">
-        <input id="subrace" name="subrace" type="text" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="strength">Strength</label>  
-      <div class="col-md-4">
-      <input id="strength" name="strength" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="endurance">Endurance</label>  
-      <div class="col-md-4">
-      <input id="endurance" name="endurance" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="perception">Perception</label>  
-      <div class="col-md-4">
-      <input id="perception" name="perception" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="intelligence">Intelligence</label>  
-      <div class="col-md-4">
-      <input id="intelligence" name="intelligence" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="agility">Agility</label>  
-      <div class="col-md-4">
-      <input id="agility" name="agility" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="accuracy">Accuracy</label>  
-      <div class="col-md-4">
-      <input id="accuracy" name="accuracy" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="charisma">Charisma</label>  
-      <div class="col-md-4">
-      <input id="charisma" name="charisma" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    <input type="submit" value="Create">
-    
+  <button class="btn"><input type="submit" value="Create"></button>
     </fieldset>
     </form>
+  </div>
     

@@ -1,14 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Item from '../../components/Item.svelte';
 	import Modal from '../../components/Modal.svelte';
   	import { HOST } from "$lib/host";
 
     let holder: string;
-	let names: [string, unknown][] | null;
+	let names: {};
 	let bagItems = writable([]);
+	var menuItem: HTMLElement
 	onMount(async () => {
+		menuItem = document.getElementById("menu-bag")!
+		menuItem.classList.remove("btn-outline")
 		{
 			const res = await fetch(HOST + "bag");
 			const data = await res.json();
@@ -22,36 +25,64 @@
 		GetPlayerNames()
 	});
 
-	async function ChangeHolder(id: string) {
-		await fetch(HOST + "bag/holder", {
+	onDestroy(() => {
+		menuItem.classList.add("btn-outline")
+	})
+
+	const ChangeHolder = (e: any) => {
+		const formData = new FormData(e.target)
+		let playerName = formData.get("select-player")!.toString()
+
+		let userId: string = "";
+		for (const [id, name] of Object.entries(names)) {
+			if (name === playerName) {
+			userId = id;
+			break;
+			}
+		}
+
+		fetch(HOST + "bag/holder", {
 			method: "POST",
-			body: JSON.stringify(parseInt(id))
+			body: JSON.stringify(parseInt(userId))
 		})
+		window.location.reload()
 	}
 
 	async function GetPlayerNames() {
 				const res = await fetch(HOST + 'players-names');
 				const data = await res.json();
-				names = Object.entries(data)
+				names = data
 	}
 
 	let showModal = false;
 </script>
 
 <Modal bind:showModal>
-	<h2>New Holder:</h2>
 	{#if names != null}
-	{#each names as id}
-		<button on:click={()=>{ChangeHolder(id[0])}}>{id[1]}</button>
-	{/each}
+	<form on:submit|preventDefault={ChangeHolder} class="flex flex-col justify-center">
+		<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
+			<option disabled selected>Select Player</option>
+			{#each Object.values(names) as name}
+			<option>{name}</option>
+			{/each}
+		</select>
+		<button class="btn"><input type="submit" value="Change"></button>
+	</form>
+	{:else}
+	No Players!
 	{/if}
 </Modal>
-<h1>Bag of Holding</h1>
-{#if holder != undefined}
-<h2>Current Holder: {holder}</h2>
+<div class="flex justify-center pb-6">
+	<span class="text-3xl my-auto">Bag of Holding</span>
+	<button class="btn btn-outline btn-success ml-4 rounded-full" on:click={()=>{showModal=true;}}>Change holder</button>
+</div>
+{#if holder != undefined && holder != ""}
+<div class="flex justify-center pb-6">
+	<span class="text-3xl">Holder: {holder}</span>
+</div>
 {/if}
-<button on:click={()=>{showModal=true;}}>Change owner</button>
-<div class="ItemHolder">
+
+<div class="flex flex-wrap gap-5 justify-center">
 	{#if $bagItems != null}
 	{#each $bagItems as item}
 		<Item id={item} bag={true} />
@@ -60,11 +91,3 @@
 	<h1>No Items</h1>
 	{/if}
 </div>
-
-<style>
-	.ItemHolder {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-	}
-</style>

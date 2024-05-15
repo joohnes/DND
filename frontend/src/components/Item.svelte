@@ -22,7 +22,16 @@
 			charisma: data.charisma,
 			quantity: data.quantity
 		};
+		GetPlayerNames()
 	});
+	
+	let rarityColorMap = new Map<string, string>([
+		["Common", "badge-default"],
+		["Rare", "badge-success"],
+		["Epic", "badge-info"],
+		["Legendary", "badge-warning"],
+		["Artefact", "badge-error"]
+	]);
 
 	async function Drop() {
 		if (!playerView) {
@@ -51,27 +60,48 @@
 		window.location.reload()
 	}
 
-	async function TransferItemToPlayer(id: string) {
-		await fetch(HOST + "bag/transfer/" + i.id + "/" + id, {
+	const TransferItemToPlayer = (e: any) => {
+		const formData = new FormData(e.target)
+		let playerName = formData.get("select-player")!.toString()
+
+		let userId: string = "";
+		for (const [id, name] of Object.entries(names)) {
+			if (name === playerName) {
+			userId = id;
+			break;
+			}
+		}
+
+		fetch(HOST + "bag/transfer/" + i.id + "/" + userId, {
 			method: "POST",
 		})
 		window.location.reload()
 	}
 
-	async function AddItemToPlayer(id: string) {
-		await fetch(HOST + "player/" + id + "/add-item/" + i.id, {
+	const AddItemToPlayer = (e: any) => {
+		const formData = new FormData(e.target)
+		let playerName = formData.get("select-player")!.toString()
+
+		let userId: string = "";
+		for (const [id, name] of Object.entries(names)) {
+			if (name === playerName) {
+			userId = id;
+			break;
+			}
+		}
+
+		fetch(HOST + "player/" + userId + "/add-item/" + i.id, {
 			method: "POST",
 		})
 		window.location.reload()
 	}
 	
-	let names: [string, unknown][] | null;
+	let names: {};
 	async function GetPlayerNames() {
 				const res = await fetch(HOST + 'players-names');
 				const data = await res.json();
-				names = Object.entries(data)
+				names = data
 	}
-	GetPlayerNames()
 
 	let showModal = false;
 	let modalBag = false;
@@ -79,31 +109,39 @@
 	export let bag: boolean = false;
 	export let playerView: boolean = false;
 </script>
+
 {#if !modalBag}
 <Modal bind:showModal>
-	<h2>Delete item?</h2>
-	<button on:click={()=> {DeleteItem()}}>DELETE</button>
+	<span class="mb-4">Delete item?</span>
+	<button class="btn btn-error btn-outline btn-md hover:btn-outline" on:click={()=> {DeleteItem()}}>DELETE</button>
 </Modal>
 {:else}
 <Modal bind:showModal>
-	<h2>Transfer item</h2>
 	{#if !bag}
-		<button on:click={()=>{TransferItemToBag()}}>To Bag</button>
+		<button class="btn btn-outline btn-info btn-md mb-4 hover:btn-outline" on:click={()=>{TransferItemToBag()}}>To Bag</button>
 	{/if}
 	{#if bag || playerView}
-		<h3><button on:click={()=>{Drop()}}>Drop</button></h3>
+		<button class="btn btn-info btn-md m-6" on:click={()=>{Drop()}}>Drop item</button>
 	{/if}
 	{#if names != null}
-		<h3>To Player</h3>
+	<form on:submit|preventDefault={bag ? TransferItemToPlayer : AddItemToPlayer} class="flex flex-col justify-center">
 	{#if bag}
-		{#each names as id}
-			<button on:click={()=>{TransferItemToPlayer(id[0])}}>{id[1]}</button>
-		{/each}
+		<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
+			<option disabled selected>Select Player</option>
+			{#each Object.entries(names) as id}
+				<option>{id[1]}</option>
+			{/each}
+		</select>
 	{:else}
-		{#each names as id}
-			<button on:click={()=>{AddItemToPlayer(id[0])}}>{id[1]}</button>
-		{/each}
+		<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
+			<option disabled selected>Select Player</option>
+			{#each Object.entries(names) as id}
+				<option>{id[1]}</option>
+			{/each}
+		</select>
 	{/if}
+	<button class="btn"><input type="submit" value="Change"></button>
+	</form>
 	
 	{/if}
 </Modal>
@@ -112,24 +150,25 @@
 	{#if i != undefined}
 		<div class="item">
 			<div class="info">
-				<div class="type">Item</div>
 				<div>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<a on:click={()=>{modalBag=true;showModal=true;}}>💰</a>
+					<span on:click={()=>{modalBag=true;showModal=true;}}>💰</span>
 					<a href={window.location.origin+"/items/update/"+id}>⚙️</a>
+				</div>
+				<div>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<a on:click={()=>{modalBag=false;showModal=true;}}>❌</a>
+					<span on:click={()=>{modalBag=false;showModal=true;}}>❌</span>
 				</div>
 			</div>
 			<div class="cellHolder">
-				<div>{i.name} x{i.quantity}</div>
-				<div>{i.rarity}</div>
+				<div class="underline underline-offset-1}">{i.name} x{i.quantity}</div>
+				<div class="badge badge-ghost badge-outline {rarityColorMap.get(i.rarity)}">{i.rarity}</div>
 			</div>
-			<div class="cellHolder stats">
+			<div class="cellHolder flex-col">
 				<div class="statsCell">
 					<div>Strength:</div>
 					<div>{i.strength}</div>
@@ -183,26 +222,26 @@
 		padding: 1rem;
 		border: 3px solid black;
 		border-radius: 1rem;
+		@apply border-slate-500;
 	}
 	.cellHolder {
 		display: flex;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.311);
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid;
+		@apply border-slate-600;
 		justify-content: space-between;
-	}
-	.stats {
-		flex-direction: column;
 	}
 	.statsCell {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
 	}
-	.type {
-		margin-top: auto;
-		font-size: 0.6rem;
-	}
 	.info {
 		display: flex;
 		justify-content: space-between;
+	}
+	.info > div > span, .info > div > a {
+		cursor: pointer;
 	}
 </style>

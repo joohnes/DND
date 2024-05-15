@@ -1,14 +1,16 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
+const isDev = true
+
 export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
 		proxy: {
 		  '/api': {
-			target: 'http://backend:8000',
+			target: isDev ? "http://localhost:8000" : 'http://backend:8000',
 			changeOrigin: true,
-			secure: false,
+			secure: !isDev,
 			rewrite: (path) => path.replace(/^\/api/, ''),
 		  },
 		},

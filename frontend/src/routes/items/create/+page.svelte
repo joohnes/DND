@@ -1,5 +1,17 @@
 <script lang="ts">
   import { HOST } from "$lib/host";
+	import { onMount, onDestroy } from 'svelte';
+
+	var menuItem: HTMLElement
+  onMount(()=> {
+    menuItem = document.getElementById("menu-items-create")!
+		menuItem.classList.remove("btn-outline")
+
+  })
+
+  onDestroy(() => {
+		menuItem.classList.add("btn-outline")
+	})
 
   const sendData = (e: any) => {
       let i: Item
@@ -27,96 +39,82 @@
     }
 </script>
 
-<form class="form-horizontal" on:submit|preventDefault={sendData}>
-    <fieldset>
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="name">Name</label>  
-      <div class="col-md-4">
-      <input id="name" name="name" type="text" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="description">Description</label>  
-      <div class="col-md-4">
-      <input id="description" name="description" type="text" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="ability">Ability</label>  
-      <div class="col-md-4">
-      <input id="ability" name="ability" type="text" class="form-control input-md">
-      </div>
-    </div>
+<div class="h-screen my-auto items-center py-1 px-8 m-2 flex flex-col drop-shadow-xl">
+<form on:submit|preventDefault={sendData}>
+    <fieldset class="border border-slate-900 rounded-lg p-5 shadow-2xl">
+    <div class="flex gap-20">
+      <div>
+        <label for="name">Name</label>  
+        <div>
+        <input id="name" name="name" type="text" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="description">Description</label>  
+        <div>
+        <input id="description" name="description" type="text" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="ability">Ability</label>  
+        <div>
+        <input id="ability" name="ability" type="text" class="input input-bordered w-full max-w-xs">
+        </div>
 
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="rarity">Rarity</label>  
-      <div class="col-md-4">
-      <select name="rarity">
-        <option>Common</option>
-        <option>Rare</option>
-        <option>Legendary</option>
-        <option>Artefact</option>
-      </select>
+        <label for="rarity">Rarity</label>  
+        <div >
+          <select name="rarity" class="select select-bordered w-full max-w-xs">
+            <option disabled selected>Choose Rarity</option>
+            <option>Common</option>
+            <option>Rare</option>
+            <option>Epic</option>
+            <option>Legendary</option>
+            <option>Artefact</option>
+          </select>
+        </div>
       </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="strength">Strength</label>  
-      <div class="col-md-4">
-      <input id="strength" name="strength" type="number" placeholder="" class="form-control input-md">
+      
+      <div>
+        <label for="strength">Strength</label>  
+        <div >
+        <input id="strength" name="strength" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="endurance">Endurance</label>  
+        <div >
+        <input id="endurance" name="endurance" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="perception">Perception</label>  
+        <div >
+        <input id="perception" name="perception" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="intelligence">Intelligence</label>  
+        <div >
+        <input id="intelligence" name="intelligence" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="agility">Agility</label>  
+        <div >
+        <input id="agility" name="agility" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="accuracy">Accuracy</label>  
+        <div >
+        <input id="accuracy" name="accuracy" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+      
+        <label for="charisma">Charisma</label>  
+        <div >
+        <input id="charisma" name="charisma" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
+        
+        <label for="quantity">Quantity</label>  
+        <div >
+          <input id="quantity" name="quantity" type="number" placeholder="" class="input input-bordered w-full max-w-xs">
+        </div>
       </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="endurance">Endurance</label>  
-      <div class="col-md-4">
-      <input id="endurance" name="endurance" type="number" placeholder="" class="form-control input-md">
       </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="perception">Perception</label>  
-      <div class="col-md-4">
-      <input id="perception" name="perception" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="intelligence">Intelligence</label>  
-      <div class="col-md-4">
-      <input id="intelligence" name="intelligence" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="agility">Agility</label>  
-      <div class="col-md-4">
-      <input id="agility" name="agility" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="accuracy">Accuracy</label>  
-      <div class="col-md-4">
-      <input id="accuracy" name="accuracy" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="charisma">Charisma</label>  
-      <div class="col-md-4">
-      <input id="charisma" name="charisma" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="quantity">Quantity</label>  
-      <div class="col-md-4">
-        <input id="quantity" name="quantity" type="number" placeholder="" class="form-control input-md">
-      </div>
-    </div>
-    <input type="submit" value="Create">
+      <button class="btn"><input type="submit" value="Create"></button>
     </fieldset>
     </form>
-    
+    </div>

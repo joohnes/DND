@@ -34,8 +34,8 @@
 </div>
 
 <style>
-    .img {
+    /* .img {
         width: 20px;
         height: 20px;
-    }
+    } */
 </style>

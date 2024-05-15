@@ -1,10 +1,8 @@
-<script lang="ts">
+<script>
 	import { onMount } from "svelte";
 
-	onMount(()=>{
+
+	onMount(()=> {
 		window.location.href = window.location.origin + "/players"
 	})
 </script>
-
-<main>
-</main>

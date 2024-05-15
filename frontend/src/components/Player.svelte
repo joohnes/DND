@@ -51,36 +51,40 @@
 		window.location.href = window.location.origin + "/players"
 	}
 
-	let modalUpdate = true;
-	let showModal = false;
+	let showModal: boolean;
+	let modalUpdate: boolean
 	export let id: number = 0;
 </script>
 {#if modalUpdate}
 <Modal bind:showModal>
+	<div class="flex flex-col justify-center items-center">
 	<h2>Enter new HP and MANA</h2>
-	<div>
+	<div class="flex flex-col py-2">
 		<label for="hp">HP</label>
-		<input type="number" id="hp" name="hp" bind:value={hp}>
+		<input type="number" id="hp" name="hp" class="input input-sm input-bordered w-20" bind:value={hp}>
 		<label for="mana">MANA</label>
-		<input type="number" id="mana" name="mana" bind:value={mana}>
+		<input type="number" id="mana" name="mana" class="input input-sm input-bordered w-20" bind:value={mana}>
 	</div>
-	<button on:click={()=> {UpdateHPMANA()}}>Update</button>
+	<button class="btn" on:click={()=> {UpdateHPMANA()}}>Update</button>
+</div>
 </Modal>
 {:else}
 <Modal bind:showModal>
+	<div class="flex flex-col justify-center items-center">
 	<h2>Delete player?</h2>
-	<button on:click={()=> {DeletePlayer()}}>DELETE</button>
+	<button class="btn" on:click={()=> {DeletePlayer()}}>DELETE</button>
+</div>
 </Modal>
 {/if}
 {#if p != undefined}
 	<div class="player">
 		<div class="info">
-			<div class="type">Player</div>
 			<div>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<!-- svelte-ignore a11y-missing-attribute -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<a on:click={()=>{modalUpdate=true;showModal=true;}}><span style="color:red;">HP</span><span style="color:blue">MANA</span></a>
+				<span on:click={()=>{modalUpdate=true;showModal = true}}><span class="text-red-500">HP</span><span class="text-blue-600">MANA</span></span>
+			</div>
+			<div>
 				<a href={window.location.origin+"/players/update/"+id}>⚙️</a>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -89,19 +93,19 @@
 			</div>
 		</div>
 		<div class="cellHolder">
-			<div>{p.name}</div>
-			<div>LVL {p.level}</div>
+			<div class="underline underline-offset-1">{p.name}</div>
+			<div class="badge badge-ghost badge-outline">LVL {p.level}</div>
 		</div>
 		<div class="cellHolder">
-			<div>{p.class}</div>
-			<div>{p.race}</div>
-			<div>{p.subrace}</div>
+			<div class="badge badge-primary badge-outline">{p.class}</div>
+			<div class="badge badge-secondary badge-outline">{p.race}</div>
+			<div class="badge badge-accent badge-outline">{p.subrace}</div>
 		</div>
 		<div class="cellHolder">
-			<div>HP {p.health}</div>
-			<div>MANA {p.mana}</div>
+			<div class="badge badge-outline badge-error">HP {p.health}</div>
+			<div class="badge badge-outline badge-info">MANA {p.mana}</div>
 		</div>
-		<div class="cellHolder stats">
+		<div class="cellHolder flex-col">
 			<div class="statsCell">
 				<div>Strength:</div>
 				<div>{p.strength}</div>
@@ -131,10 +135,10 @@
 				<div>{p.charisma}</div>
 			</div>
 		</div>
-		<div class="cellHolder">
+		<div class="flex flex-wrap gap-4">
 			{#if $items != null}
 			{#each $items as item}
-			<SmallItem id={item}/>
+				<SmallItem id={item}/>
 			{/each}
 			{/if}
 		</div>
@@ -148,28 +152,28 @@
 		width: 15rem;
 		justify-content: space-between;
 		padding: 1rem;
-		border: 3px solid black;
+		border: 3px solid;
 		border-radius: 1rem;
+		@apply border-slate-500;
 	}
 	.cellHolder {
 		display: flex;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.311);
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid;
+		@apply border-slate-600;
 		justify-content: space-between;
-	}
-	.stats {
-		flex-direction: column;
 	}
 	.statsCell {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
 	}
-	.type {
-		margin-top: auto;
-		font-size: 0.6rem;
-	}
 	.info {
 		display: flex;
 		justify-content: space-between;
+	}
+	.info > div > span, .info > div > a {
+		cursor: pointer;
 	}
 </style>
