@@ -37,11 +37,11 @@ func ConnectDB() (*sql.DB, error) {
 		}
 	}
 
-	err = createDB(db, !cfg.Production)
+	err = createDB(db)
 	return db, err
 }
 
-func createDB(db *sql.DB, sqlite bool) error {
+func createDB(db *sql.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
