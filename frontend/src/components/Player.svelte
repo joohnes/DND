@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Modal from './Modal.svelte'
-	import SmallItem from './SmallItem.svelte';
-	import { writable } from 'svelte/store';
+	import PlayerEQ from './PlayerEQ.svelte';
   	import { HOST } from "$lib/host";
 
 	let p: Player;
-	let items = writable([])
 	onMount(async function () {
 		const res = await fetch(HOST + 'player/' + id);
 		const data = await res.json();
@@ -27,7 +25,6 @@
 			accuracy: data.accuracy,
 			charisma: data.charisma,
 		};
-		items.set(data.items)
 	});
 
 	let hp: number;
@@ -52,7 +49,8 @@
 	}
 
 	let showModal: boolean;
-	let modalUpdate: boolean
+	let modalUpdate: boolean;
+	let modalEq: boolean;
 	export let id: number = 0;
 </script>
 {#if modalUpdate}
@@ -68,12 +66,16 @@
 	<button class="btn" on:click={()=> {UpdateHPMANA()}}>Update</button>
 </div>
 </Modal>
-{:else}
+{:else if !modalUpdate && !modalEq}
 <Modal bind:showModal>
 	<div class="flex flex-col justify-center items-center">
 	<h2>Delete player?</h2>
 	<button class="btn" on:click={()=> {DeletePlayer()}}>DELETE</button>
 </div>
+</Modal>
+{:else if modalEq}
+<Modal bind:showModal fullScreen={true}>
+	<PlayerEQ id={p.id}/>
 </Modal>
 {/if}
 {#if p != undefined}
@@ -82,14 +84,17 @@
 			<div>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<span on:click={()=>{modalUpdate=true;showModal = true}}><span class="text-red-500">HP</span><span class="text-blue-600">MANA</span></span>
+				<span on:click={()=>{modalUpdate=false;modalEq=true;showModal = true}}>[EQ]</span>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<span on:click={()=>{modalUpdate=true;modalEq=false;showModal = true}}><span class="text-red-500">HP</span><span class="text-blue-600">MANA</span></span>
 			</div>
 			<div>
 				<a href={window.location.origin+"/players/update/"+id}>⚙️</a>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-missing-attribute -->
-				<a on:click={()=>{modalUpdate=false;showModal=true}}>❌</a>
+				<a on:click={()=>{modalUpdate=false;modalEq=false;showModal=true}}>❌</a>
 			</div>
 		</div>
 		<div class="cellHolder">
@@ -98,11 +103,11 @@
 		</div>
 		<div class="cellHolder">
 			<div class="badge badge-primary badge-outline">{p.class}</div>
-			<div class="badge badge-secondary badge-outline">{p.race}</div>
+			<div class="badge badge-warning badge-outline">{p.race}</div>
 			<div class="badge badge-accent badge-outline">{p.subrace}</div>
 		</div>
 		<div class="cellHolder">
-			<div class="badge badge-outline badge-error">HP {p.health}</div>
+			<div class="badge badge-outline badge-secondary">HP {p.health}</div>
 			<div class="badge badge-outline badge-info">MANA {p.mana}</div>
 		</div>
 		<div class="cellHolder flex-col">
@@ -134,13 +139,6 @@
 				<div>Charisma:</div>
 				<div>{p.charisma}</div>
 			</div>
-		</div>
-		<div class="flex flex-wrap gap-4">
-			{#if $items != null}
-			{#each $items as item}
-				<SmallItem id={item}/>
-			{/each}
-			{/if}
 		</div>
 	</div>
 {/if}

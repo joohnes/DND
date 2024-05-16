@@ -7,14 +7,14 @@
   <div class="navbar-center">
     <ul class="menu menu-horizontal px-1">
       <div class="join mr-4">
-        <button id="menu-players" class="btn btn-ghost btn-outline join-item btn-sm rounded-l-full hover:btn-info"><a href="/players">Players</a></button>
-        <button id="menu-players-create" class="btn btn-outline btn-error join-item btn-sm rounded-r-full"><a href="/players/create">Create</a></button>
+        <button id="menu-players" class="btn btn-ghost btn-outline join-item btn-sm rounded-l-full hover:btn-primary"><a href="/players">Players</a></button>
+        <button id="menu-players-create" class="btn btn-outline btn-secondary join-item btn-sm rounded-r-full"><a href="/players/create">Create</a></button>
       </div>
       <div class="join mr-4">
-        <button id="menu-items"class="btn btn-ghost btn-outline join-item btn-sm rounded-l-full hover:btn-info"><a href="/items">Items</button>
-        <button id="menu-items-create" class="btn btn-outline btn-error join-item btn-sm rounded-r-full"><a href="/items/create">Create</a></button>
+        <button id="menu-items"class="btn btn-ghost btn-outline join-item btn-sm rounded-l-full hover:btn-primary"><a href="/items">Items</button>
+        <button id="menu-items-create" class="btn btn-outline btn-secondary join-item btn-sm rounded-r-full"><a href="/items/create">Create</a></button>
       </div>
-      <button id="menu-bag" class="btn btn-info btn-outline join-item btn-sm rounded-full"><a href="/bag">Bag of Holding</a></button>
+      <button id="menu-bag" class="btn btn-primary btn-outline join-item btn-sm rounded-full"><a href="/bag">Bag of Holding</a></button>
     </ul>
   </div>
   <div class="navbar-end mr-8">

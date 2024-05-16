@@ -2,6 +2,24 @@
 	import { onMount } from "svelte";
   import { HOST } from "$lib/host";
 
+  let slotMap = new Map<string, number>([
+		["Head", 1],
+		["Chest", 2],
+		["Shoulders", 3],
+		["Hands", 4],
+		["Legs", 5],
+		["Feet", 6],
+	])
+
+  let slotRevMap = new Map<number | undefined, string>([
+		[1, "Head"],
+		[2, "Chest"],
+		[3, "Shoulders"],
+		[4, "Hands"],
+		[5, "Legs"],
+		[6, "Feet"],
+	])
+
     /** @type {import('./$types').PageData} */
     export let data;
     const id = data.data
@@ -21,7 +39,8 @@
         agility: parseInt(formData.get("agility")!.toString()),
         accuracy: parseInt(formData.get("accuracy")!.toString()),
         charisma: parseInt(formData.get("charisma")!.toString()),
-        quantity: parseInt(formData.get("quantity")!.toString())
+        quantity: parseInt(formData.get("quantity")!.toString()),
+        slot: slotMap.get(formData.get("slot")!.toString())
       }
 
       fetch(HOST + "item/" + id, {
@@ -47,7 +66,8 @@
         agility: data.agility,
         accuracy: data.accuracy,
         charisma: data.charisma,
-        quantity: data.quantity
+        quantity: data.quantity,
+        slot: data.slot
       };
     });
   </script>
@@ -81,6 +101,19 @@
                 <option>Epic</option>
                 <option>Legendary</option>
                 <option>Artefact</option>
+              </select>
+            </div>
+            
+            <label for="slot">Slot</label>  
+            <div>
+              <select name="slot" value={slotRevMap.get(i.slot)} class="select select-bordered w-full max-w-xs">
+                <option disabled selected>Choose slot</option>
+                <option>Head</option>
+                <option>Chest</option>
+                <option>Shoulders</option>
+                <option>Hands</option>
+                <option>Legs</option>
+                <option>Feet</option>
               </select>
             </div>
           </div>

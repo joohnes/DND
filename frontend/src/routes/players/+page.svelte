@@ -10,20 +10,20 @@
 		menuItem = document.getElementById("menu-players")!
 		if (menuItem != undefined) {
 			menuItem.classList.remove("btn-ghost")
-			menuItem.classList.add("btn-remove")
-			menuItem.classList.add("btn-info")
+			menuItem.classList.remove("btn-outline")
+			menuItem.classList.add("btn-primary")
 		}
 		
 		const res = await fetch(HOST + 'players');
 		const data = await res.json();
 		players.set(data);
-		console.log(data)
 	});
+	
 	onDestroy(() => {
 		if (menuItem != undefined) {
 			menuItem.classList.add("btn-ghost")
 			menuItem.classList.add("btn-outline")
-			menuItem.classList.remove("btn-info")
+			menuItem.classList.remove("btn-primary")
 		}
 	})
 

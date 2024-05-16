@@ -24,6 +24,7 @@ declare global {
 		charisma: number;
 		owner?: number;
 		quantity: number;
+		slot?: number;
 	}
 
 	interface Player {
@@ -44,6 +45,7 @@ declare global {
 		charisma: number;
 		session?: number;
 		items?: number[];
+		equipped?: number[];
 	}
 
 	interface Bag {

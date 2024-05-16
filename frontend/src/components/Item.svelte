@@ -20,7 +20,8 @@
 			agility: data.agility,
 			accuracy: data.accuracy,
 			charisma: data.charisma,
-			quantity: data.quantity
+			quantity: data.quantity,
+			slot: data.slot
 		};
 		GetPlayerNames()
 	});
@@ -32,6 +33,15 @@
 		["Legendary", "badge-warning"],
 		["Artefact", "badge-error"]
 	]);
+
+	let slotMap = new Map<number, string>([
+		[1, "Head"],
+		[2, "Chest"],
+		[3, "Shoulders"],
+		[4, "Hands"],
+		[5, "Legs"],
+		[6, "Feet"],
+	])
 
 	async function Drop() {
 		if (!playerView) {
@@ -103,11 +113,34 @@
 				names = data
 	}
 
+	async function Equip() {
+		const data = {
+			playerID: playerID,
+			itemID: id,
+		}
+
+		await fetch(HOST + "item/equip", {
+			method: "POST",
+			body: JSON.stringify(data)
+		})
+		window.location.reload()
+	}
+
+	async function Unequip() {
+		await fetch(HOST + "item/unequip/" + id, {
+			method: "DELETE",
+		})
+		window.location.reload()
+	}
+
 	let showModal = false;
 	let modalBag = false;
 	export let id: number = 0;
+	export let playerID: number = 0;
 	export let bag: boolean = false;
 	export let playerView: boolean = false;
+	export let eqView: boolean = false;
+	export let equipped: boolean = false;
 </script>
 
 {#if !modalBag}
@@ -117,35 +150,44 @@
 </Modal>
 {:else}
 <Modal bind:showModal>
-	{#if !bag}
-		<button class="btn btn-outline btn-info btn-md mb-4 hover:btn-outline" on:click={()=>{TransferItemToBag()}}>To Bag</button>
-	{/if}
-	{#if bag || playerView}
-		<button class="btn btn-info btn-md m-6" on:click={()=>{Drop()}}>Drop item</button>
-	{/if}
-	{#if names != null}
-	<form on:submit|preventDefault={bag ? TransferItemToPlayer : AddItemToPlayer} class="flex flex-col justify-center">
-	{#if bag}
-		<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
-			<option disabled selected>Select Player</option>
-			{#each Object.entries(names) as id}
-				<option>{id[1]}</option>
-			{/each}
-		</select>
-	{:else}
-		<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
-			<option disabled selected>Select Player</option>
-			{#each Object.entries(names) as id}
-				<option>{id[1]}</option>
-			{/each}
-		</select>
-	{/if}
-	<button class="btn"><input type="submit" value="Change"></button>
-	</form>
-	
-	{/if}
+	<div class="flex gap-24">
+		<div class="flex flex-col justify-start content-start">
+		{#if !bag}
+				<button class="btn btn-outline btn-info btn-md mb-4 hover:btn-outline px-8" on:click={()=>{TransferItemToBag()}}>To Bag</button>
+			{/if}
+		{#if bag || playerView || eqView}
+			{#if eqView}
+				<div class="flex flex-col justify-center">
+					{#if !equipped}
+					<button on:click={Equip} class="btn btn-outline btn-accent btn-md hover:btn-outline mb-4 px-8">Equip</button>
+					{:else}
+					<button on:click={Unequip} class="btn btn-outline btn-error btn-md hover:btn-outline mb-4 px-8">Unequip</button>
+					{/if}
+				</div>
+			{/if}
+			{#if bag || playerView}
+				<button class="btn btn-outline btn-error btn-md px-8" on:click={()=>{Drop()}}>Drop item</button>
+			{/if}
+		{/if}
+	</div>
+		{#if names != null}
+		<div class="flex flex-col justify-start content-start">
+			<form on:submit|preventDefault={bag ? TransferItemToPlayer : AddItemToPlayer} class="flex flex-col justify-center">
+				<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
+					<option disabled selected>Select Player</option>
+					{#each Object.entries(names) as id}
+						<option>{id[1]}</option>
+					{/each}
+				</select>
+				<input class="btn" type="submit" value="Change">
+			</form>
+		</div>
+		{/if}
+	</div>
 </Modal>
 {/if}
+
+
 <div>
 	{#if i != undefined}
 		<div class="item">
@@ -168,6 +210,11 @@
 				<div class="underline underline-offset-1}">{i.name} x{i.quantity}</div>
 				<div class="badge badge-ghost badge-outline {rarityColorMap.get(i.rarity)}">{i.rarity}</div>
 			</div>
+			{#if i.slot != undefined}
+			<div class="cellHolder">
+				<div class="badge badge-ghost badge-outline">{slotMap.get(i.slot)}</div>
+			</div>
+			{/if}
 			<div class="cellHolder flex-col">
 				<div class="statsCell">
 					<div>Strength:</div>

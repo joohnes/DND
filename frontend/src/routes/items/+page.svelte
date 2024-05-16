@@ -10,8 +10,8 @@
 		menuItem = document.getElementById("menu-items")!
 		if (menuItem != undefined) {
 			menuItem.classList.remove("btn-ghost")
-			menuItem.classList.add("btn-remove")
-			menuItem.classList.add("btn-info")
+			menuItem.classList.remove("btn-outline")
+			menuItem.classList.add("btn-primary")
 		}
 
 		const res = await fetch(HOST + 'items');
@@ -23,7 +23,7 @@
 		if (menuItem != undefined) {
 			menuItem.classList.add("btn-ghost")
 			menuItem.classList.add("btn-outline")
-			menuItem.classList.remove("btn-info")
+			menuItem.classList.remove("btn-primary")
 		}
 	})
 </script>

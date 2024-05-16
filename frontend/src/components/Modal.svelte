@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let showModal: Boolean;
+	export let fullScreen: boolean = false;
 
 	let dialog: HTMLDialogElement;
 
@@ -13,7 +14,7 @@
 	on:click|self={() => dialog.close()}
 	class="modal"
 >
-<div class="modal-box grid justify-items-center">
+<div class="modal-box grid justify-items-center {fullScreen ? "max-w-none w-full":""}">
     <slot />
 	<form method="dialog" class="modal-backdrop">
 		<button></button>

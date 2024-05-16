@@ -13,6 +13,15 @@
 		menuItem.classList.add("btn-outline")
 	})
 
+  let slotMap = new Map<string, number>([
+		["Head", 1],
+		["Chest", 2],
+		["Shoulders", 3],
+		["Hands", 4],
+		["Legs", 5],
+		["Feet", 6],
+	])
+
   const sendData = (e: any) => {
       let i: Item
       const formData = new FormData(e.target)
@@ -29,6 +38,7 @@
         accuracy: parseInt(formData.get("accuracy")!.toString()),
         charisma: parseInt(formData.get("charisma")!.toString()),
         quantity: parseInt(formData.get("quantity")!.toString()),
+        slot: slotMap.get(formData.get("slot")!.toString())
       }
 
       fetch(HOST + "item", {
@@ -60,7 +70,7 @@
         </div>
 
         <label for="rarity">Rarity</label>  
-        <div >
+        <div>
           <select name="rarity" class="select select-bordered w-full max-w-xs">
             <option disabled selected>Choose Rarity</option>
             <option>Common</option>
@@ -68,6 +78,19 @@
             <option>Epic</option>
             <option>Legendary</option>
             <option>Artefact</option>
+          </select>
+        </div>
+
+        <label for="slot">Slot</label>  
+        <div>
+          <select name="slot" class="select select-bordered w-full max-w-xs">
+            <option disabled selected>Choose slot</option>
+            <option>Head</option>
+            <option>Chest</option>
+            <option>Shoulders</option>
+            <option>Hands</option>
+            <option>Legs</option>
+            <option>Feet</option>
           </select>
         </div>
       </div>
