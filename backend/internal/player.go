@@ -248,7 +248,7 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 			return nil, err
 		}
 
-		rows, err := srv.db.Query("SELECT item, equipped FROM player_items WHERE player = ?", p.Id)
+		rowsItems, err := srv.db.Query("SELECT item, equipped FROM player_items WHERE player = ?", p.Id)
 		defer rows.Close()
 		if err != nil {
 			if err != sql.ErrNoRows {
@@ -257,10 +257,10 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 			return nil, nil
 		}
 
-		for rows.Next() {
+		for rowsItems.Next() {
 			var itemID int
 			var equipped int
-			if err := rows.Scan(
+			if err := rowsItems.Scan(
 				&itemID,
 				&equipped,
 			); err != nil {
