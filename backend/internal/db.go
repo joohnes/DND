@@ -48,11 +48,7 @@ func createDB(db *sql.DB, sqlite bool) error {
 	}
 	defer tx.Rollback()
 
-	if sqlite {
-		err = createTablesSqlite(tx)
-	} else {
-		err = createTablesMysql(tx)
-	}
+	createTablesMysql(tx)
 
 	// create holder in settings
 	if tx.QueryRow(`SELECT name FROM settings WHERE name = 'bag_holder';`).Scan(nil) == sql.ErrNoRows {
@@ -61,7 +57,7 @@ func createDB(db *sql.DB, sqlite bool) error {
 
 	// create basic player
 	var name string
-	if tx.QueryRow(`SELECT name FROM players WHERE id = 0;`).Scan(&name) == sql.ErrNoRows {
+	if tx.QueryRow(`SELECT name FROM players WHERE id = 0;`).Scan(&name) != sql.ErrNoRows {
 		if name != BasicPlayer {
 			query := `UPDATE players SET id = id + 1;`
 			_, _ = tx.Exec(query)
@@ -114,10 +110,9 @@ func createTablesMysql(tx *sql.Tx) error {
 			accuracy INTEGER,
 			charisma INTEGER,
 			quantity INTEGER,
-			equipped INTEGER,
+			slot INTEGER DEFAULT 0,
 			PRIMARY KEY (id)
  	);`
-	// TODO: equipped
 	_, err = tx.Exec(query)
 	if err != nil {
 		return err
@@ -128,6 +123,7 @@ func createTablesMysql(tx *sql.Tx) error {
 			id INTEGER AUTO_INCREMENT,
 			player INTEGER,
 			item INTEGER,
+			equipped BOOLEAN DEFAULT FALSE,
 			PRIMARY KEY (id)
 		);`
 	_, err = tx.Exec(query)
@@ -146,94 +142,12 @@ func createTablesMysql(tx *sql.Tx) error {
 		return err
 	}
 
+	// table settings
 	query = `CREATE TABLE IF NOT EXISTS settings (
 			id INTEGER AUTO_INCREMENT,
 			name TEXT,
 			value TEXT,
 			PRIMARY KEY (id)
-			)`
-	_, err = tx.Exec(query)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// for developing purposes
-func createTablesSqlite(tx *sql.Tx) error {
-
-	// table players
-	query := `CREATE TABLE IF NOT EXISTS players (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT,
-		level INTEGER,
-		health INTEGER,
-		mana INTEGER,
-		strength INTEGER,
-		endurance INTEGER,
-		perception INTEGER,
-		intelligence INTEGER,
-		agility INTEGER,
-		accuracy INTEGER,
-		charisma INTEGER,
-		class TEXT,
-		race TEXT,
-		subrace TEXT,
-		session INTEGER
-);`
-	_, err := tx.Exec(query)
-	if err != nil {
-		return err
-	}
-
-	// table items
-	query = `CREATE TABLE IF NOT EXISTS items (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name TEXT,
-			description TEXT,
-			ability TEXT,
-			rarity TEXT,
-			strength INTEGER,
-			endurance INTEGER,
-			perception INTEGER,
-			intelligence INTEGER,
-			agility INTEGER,
-			accuracy INTEGER,
-			charisma INTEGER,
-			quantity INTEGER,
-			equipped INTEGER
- 	);`
-	// TODO: equipped
-	_, err = tx.Exec(query)
-	if err != nil {
-		return err
-	}
-
-	// table player_items
-	query = `CREATE TABLE IF NOT EXISTS player_items (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			player INTEGER,
-			item INTEGER
-		);`
-	_, err = tx.Exec(query)
-	if err != nil {
-		return err
-	}
-
-	// table bag_items
-	query = `CREATE TABLE IF NOT EXISTS bag_items (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			item INTEGER
-			);`
-	_, err = tx.Exec(query)
-	if err != nil {
-		return err
-	}
-
-	query = `CREATE TABLE IF NOT EXISTS settings (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name TEXT,
-			value TEXT
 			)`
 	_, err = tx.Exec(query)
 	if err != nil {

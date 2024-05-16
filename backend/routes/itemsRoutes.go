@@ -88,19 +88,16 @@ func DeleteItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 func EquipItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		type equipItem struct {
-			ItemID int `json:"id"`
-			Slot   int `json:"slot"`
+			PlayerID int `json:"playerID"`
+			ItemID   int `json:"itemID"`
 		}
-		var ei equipItem
-		if err := json.Unmarshal(ctx.Body(), &ei); err != nil {
-			return errors.Wrap(err, "EquipItemRoute")
-		}
-
-		if err := srv.EquipItem(ei.ItemID, ei.Slot); err != nil {
-			return errors.Wrap(err, "EquipItemRoute")
+		body := equipItem{}
+		err := json.Unmarshal(ctx.Body(), &body)
+		if err != nil {
+			return errors.Wrap(err, "PlayerEquipItemRoute")
 		}
 
-		return ctx.SendStatus(fiber.StatusOK)
+		return srv.EquipItem(body.PlayerID, body.ItemID)
 	}
 }
 
@@ -108,13 +105,9 @@ func UnequipItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
-			return errors.Wrap(err, "UnequipItemRoute")
+			return errors.Wrap(err, "PlayerUnequipItemRoute")
 		}
 
-		if err := srv.UnequipItem(itemID); err != nil {
-			return errors.Wrap(err, "UnequipItemRoute")
-		}
-
-		return ctx.SendStatus(fiber.StatusOK)
+		return srv.UnequipItem(itemID)
 	}
 }

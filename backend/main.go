@@ -49,17 +49,17 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Post("/player/:playerID/add-item/:itemID", routes.AddItemRoute(srv))
 	app.Delete("/player/drop-item/:itemID", routes.DropItemRoute(srv))
 	app.Put("/player/hpmana/:id", routes.ChangeHPandManaRoute(srv))
+	app.Get("/player/items/:playerID", routes.GetPlayerItemsRoute(srv))
 
 	// item
 	app.Post("/item", routes.CreateItemRoute(srv))
 	app.Get("/items", routes.GetItemsIDsRoute(srv))
 	app.Get("/item/:id", routes.GetItemRoute(srv))
 	app.Put("/item/:id", routes.UpdateItemRoute(srv))
-	app.Put("/equip/:id", routes.EquipItemRoute(srv))
 	app.Delete("/item/:id", routes.DeleteItemRoute(srv))
 
 	app.Post("/item/equip", routes.EquipItemRoute(srv))
-	app.Delete("/item/unequip", routes.UnequipItemRoute(srv))
+	app.Delete("/item/unequip/:itemID", routes.UnequipItemRoute(srv))
 
 	// bag
 	app.Post("/bag/add/:itemID", routes.AddItemToBagRoute(srv))

@@ -62,9 +62,17 @@ func AddItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "AddItemRoute player id")
 		}
 
+		if !srv.PlayerExists(playerID) {
+			return errors.Wrap(internal.ErrNoPlayer, "AddItemRoute")
+		}
+
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
 			return errors.Wrap(err, "AddItemRoute item id")
+		}
+
+		if !srv.ItemExists(itemID) {
+			return errors.Wrap(internal.ErrNoItem, "AddItemRoute")
 		}
 
 		return srv.AddItem(playerID, itemID)
@@ -134,5 +142,16 @@ func DeletePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		}
 
 		return ctx.SendStatus(fiber.StatusOK)
+	}
+}
+
+func GetPlayerItemsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		playerID, err := strconv.Atoi(ctx.Params("playerID"))
+		if err != nil {
+			return errors.Wrap(internal.ErrIDNotNumber, "GetPlayerItemsRoute")
+		}
+
+		return ctx.JSON(srv.GetPlayerByID(playerID).GetItems())
 	}
 }

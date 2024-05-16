@@ -2,8 +2,9 @@ package internal
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 // bag of holding
@@ -107,7 +108,7 @@ func (srv *Service) DropItemFromBag(itemID int) error {
 
 func (srv *Service) AddItemToBag(itemID int) error {
 	if srv.bag.IsItemInBag(itemID) {
-		return ErrItemAlreadyExists
+		return errors.Wrap(ErrItemAlreadyExists, "bag")
 	}
 	query := "INSERT INTO bag_items (item) VALUES (?)"
 	_, err := srv.db.Exec(query, itemID)

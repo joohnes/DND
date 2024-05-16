@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -23,6 +24,7 @@ type Player struct {
 	Accuracy     int    `json:"accuracy"`
 	Charisma     int    `json:"charisma"`
 	Session      int    `json:"-"`
+	Equipped     []int  `json:"equipped"`
 	Items        []int  `json:"items"`
 }
 
@@ -31,8 +33,61 @@ type HPMana struct {
 	Mana int `json:"mana"`
 }
 
-func (p *Player) GetItems() []int {
-	return p.Items
+type ItemsResponse struct {
+	Items    []int `json:"items"`
+	Equipped []int `json:"equipped"`
+}
+
+// slots - 1 head, 2 chest, 3 shoulders, 4 hands, 5 legs, 6 feet
+func (p *Player) GetItems() ItemsResponse {
+	return ItemsResponse{Items: p.Items, Equipped: p.Equipped}
+}
+
+func (p *Player) IsEquipped(id int) bool {
+	for _, i := range p.Equipped {
+		if i == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Player) IsInEquipment(id int) bool {
+	for _, i := range p.Items {
+		if i == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (srv *Service) EquipItem(playerID, itemID int) error {
+	fmt.Println(playerID, itemID)
+	if srv.GetPlayerByID(playerID) == nil {
+		return ErrNoPlayer
+	} else {
+		if srv.GetPlayerByID(playerID).IsEquipped(itemID) {
+			return ErrAlreadyEquipped
+		}
+	}
+
+	query := "UPDATE player_items SET equipped = 1 WHERE item = ?"
+	_, err := srv.db.Exec(query, itemID)
+	if err != nil {
+		return err
+	}
+
+	return srv.ResetObjects(PlayerType)
+}
+
+func (srv *Service) UnequipItem(itemID int) error {
+	query := "UPDATE player_items SET equipped = 0 WHERE item = ?"
+	_, err := srv.db.Exec(query, itemID)
+	if err != nil {
+		return err
+	}
+
+	return srv.ResetObjects(PlayerType)
 }
 
 func (srv *Service) DropItem(itemID int) error {
@@ -45,6 +100,13 @@ func (srv *Service) DropItem(itemID int) error {
 				p.Items = p.Items[:len(p.Items)-1]
 			}
 		}
+		for i := 0; i < len(p.Equipped); i++ {
+			if p.Equipped[i] == itemID {
+				playerID = p.Id
+				p.Equipped[i] = p.Equipped[len(p.Equipped)-1]
+				p.Equipped = p.Equipped[:len(p.Equipped)-1]
+			}
+		}
 	}
 
 	query := "DELETE FROM player_items WHERE player=? AND item=?"
@@ -53,15 +115,16 @@ func (srv *Service) DropItem(itemID int) error {
 }
 
 func (srv *Service) AddItem(playerID, itemID int) error {
+	if srv.GetPlayerByID(playerID).IsInEquipment(itemID) {
+		return errors.Wrap(ErrItemAlreadyExists, "eq")
+	}
+
 	_, err := srv.db.Exec("INSERT INTO player_items (player, item) VALUES (?, ?)", playerID, itemID)
 	if err != nil {
 		return err
 	}
 
 	player := srv.GetPlayerByID(playerID)
-	if player == nil {
-		return errors.New("player with given id not found")
-	}
 	player.Items = append(player.Items, itemID)
 
 	return nil
@@ -185,8 +248,8 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 			return nil, err
 		}
 
-		rows, err := srv.db.Query("SELECT item FROM player_items WHERE player = ?", p.Id)
-		defer func() { rows.Close() }()
+		rows, err := srv.db.Query("SELECT item, equipped FROM player_items WHERE player = ?", p.Id)
+		defer rows.Close()
 		if err != nil {
 			if err != sql.ErrNoRows {
 				return nil, err
@@ -196,13 +259,20 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 
 		for rows.Next() {
 			var itemID int
+			var equipped int
 			if err := rows.Scan(
 				&itemID,
+				&equipped,
 			); err != nil {
 				return nil, err
 			}
+			if equipped == 1 {
+				p.Equipped = append(p.Equipped, itemID)
+				continue
+			}
 			p.Items = append(p.Items, itemID)
 		}
+
 		players = append(players, p)
 	}
 	return players, nil

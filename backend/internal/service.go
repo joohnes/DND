@@ -64,6 +64,24 @@ func (srv *Service) ResetObjects(t ObjectType) error {
 	return nil
 }
 
+func (srv *Service) PlayerExists(id int) bool {
+	for _, player := range srv.players {
+		if player.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (srv *Service) ItemExists(id int) bool {
+	for _, item := range srv.items {
+		if item.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
 func (srv *Service) TestObjects() {
 	srv.players = append(srv.players, &Player{
 		Id:           1,

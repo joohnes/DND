@@ -10,4 +10,5 @@ var (
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyExists = errors.New("item already exists")
 	ErrInvalidRarity     = errors.New("invalid rarity")
+	ErrAlreadyEquipped   = errors.New("item is already equipped")
 )

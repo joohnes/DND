@@ -42,6 +42,10 @@ func TransferItemFromBagRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "TransferItemFromBagRoute player id")
 		}
 
+		if !srv.PlayerExists(playerID) {
+			return errors.Wrap(internal.ErrNoPlayer, "TransferItemFromBagRoute")
+		}
+
 		err = srv.DropItemFromBag(itemID)
 		if err != nil {
 			return errors.Wrap(err, "TransferItemFromBagRoute")
