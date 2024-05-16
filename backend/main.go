@@ -68,5 +68,4 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Delete("/bag/drop/:itemID", routes.DropItemFromBagRoute(srv))
 	app.Get("/bag/holder", routes.GetBagHolderRoute(srv))
 	app.Post("/bag/holder", routes.ChangeBagHolderRoute(srv))
-
 }
