@@ -13,9 +13,12 @@ import (
 func CreatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var player internal.Player
-		data := ctx.Body()
-		if err := json.Unmarshal(data, &player); err != nil {
+		if err := json.Unmarshal(ctx.Body(), &player); err != nil {
 			return errors.Wrap(err, "CreatePlayerRoute")
+		}
+
+		if player.Name == "" {
+			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
 		}
 
 		p, err := srv.CreatePlayer(player)
@@ -93,9 +96,12 @@ func DropItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 func UpdatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var player internal.Player
-		data := ctx.Body()
-		if err := json.Unmarshal(data, &player); err != nil {
+		if err := json.Unmarshal(ctx.Body(), &player); err != nil {
 			return errors.Wrap(err, "UpdatePlayerRoute")
+		}
+
+		if player.Name == "" {
+			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
 		}
 
 		err := srv.UpdatePlayer(player)

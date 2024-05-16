@@ -24,6 +24,8 @@ declare global {
 		charisma: number;
 		owner?: number;
 		quantity: number;
+		attack: number;
+		defense: number;
 		slot?: number;
 	}
 

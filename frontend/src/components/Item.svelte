@@ -21,6 +21,8 @@
 			accuracy: data.accuracy,
 			charisma: data.charisma,
 			quantity: data.quantity,
+			attack: data.attack,
+			defense: data.defense,
 			slot: data.slot
 		};
 		GetPlayerNames()
@@ -48,7 +50,8 @@
 			await fetch(HOST + "bag/drop/" + i.id, {
 				method: "DELETE",
 			})
-			window.location.reload()
+			showModal=false;
+			restart()
 		} else {
 			await fetch(HOST + "player/drop-item/" + i.id, {
 				method: "DELETE",
@@ -60,14 +63,16 @@
 		await fetch(HOST + "item/" + i.id, {
         method: "DELETE",
 		})
-		window.location.reload()
+		showModal=false;
+		restart()
 	}
 
 	async function TransferItemToBag() {
 		await fetch(HOST + "bag/add/" + i.id, {
 			method: "POST",
 		})
-		window.location.reload()
+		showModal=false;
+		restart()
 	}
 
 	const TransferItemToPlayer = (e: any) => {
@@ -85,7 +90,8 @@
 		fetch(HOST + "bag/transfer/" + i.id + "/" + userId, {
 			method: "POST",
 		})
-		window.location.reload()
+		showModal=false;
+		restart()
 	}
 
 	const AddItemToPlayer = (e: any) => {
@@ -103,7 +109,8 @@
 		fetch(HOST + "player/" + userId + "/add-item/" + i.id, {
 			method: "POST",
 		})
-		window.location.reload()
+		showModal=false;
+		restart()
 	}
 	
 	let names: {};
@@ -123,14 +130,14 @@
 			method: "POST",
 			body: JSON.stringify(data)
 		})
-		window.location.reload()
+		restart()
 	}
 
 	async function Unequip() {
 		await fetch(HOST + "item/unequip/" + id, {
 			method: "DELETE",
 		})
-		window.location.reload()
+		restart()
 	}
 
 	let showModal = false;
@@ -141,8 +148,10 @@
 	export let playerView: boolean = false;
 	export let eqView: boolean = false;
 	export let equipped: boolean = false;
+	export let restart: Function;
 </script>
 
+{#key showModal}
 {#if !modalBag}
 <Modal bind:showModal>
 	<span class="mb-4">Delete item?</span>
@@ -188,72 +197,76 @@
 {/if}
 
 
-<div>
 	{#if i != undefined}
-		<div class="item">
-			<div class="info">
+	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+		<div class="item collapse collapse-arrow" tabindex="0">
+			<div class="info collapse-title">
+				<div>
+					<div class="underline underline-offset-4">{i.name} x{i.quantity}</div>
+				</div>
 				<div>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<span on:click={()=>{modalBag=true;showModal=true;}}>💰</span>
 					<a href={window.location.origin+"/items/update/"+id}>⚙️</a>
-				</div>
-				<div>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<span on:click={()=>{modalBag=false;showModal=true;}}>❌</span>
 				</div>
 			</div>
-			<div class="cellHolder">
-				<div class="underline underline-offset-1}">{i.name} x{i.quantity}</div>
-				<div class="badge badge-ghost badge-outline {rarityColorMap.get(i.rarity)}">{i.rarity}</div>
-			</div>
-			{#if i.slot != undefined}
-			<div class="cellHolder">
-				<div class="badge badge-ghost badge-outline">{slotMap.get(i.slot)}</div>
-			</div>
-			{/if}
-			<div class="cellHolder flex-col">
-				<div class="statsCell">
-					<div>Strength:</div>
-					<div>{i.strength}</div>
+			<div class="collapse-content">
+				<div class="cellHolder">
+					<div class="badge badge-ghost badge-outline {rarityColorMap.get(i.rarity)}">{i.rarity}</div>
 				</div>
-				<div class="statsCell">
-					<div>Endurance:</div>
-					<div>{i.endurance}</div>
+				{#if i.slot != undefined}
+				<div class="cellHolder">
+					<div class="badge badge-ghost badge-outline">{slotMap.get(i.slot)}</div>
+					<div class="badge badge-secondary badge-outline">ATK {i.attack}</div>
+					<div class="badge badge-info badge-outline">DEF {i.defense}</div>
 				</div>
-				<div class="statsCell">
-					<div>Perception:</div>
-					<div>{i.perception}</div>
+				{/if}
+				<div class="cellHolder flex-col">
+					<div class="statsCell">
+						<div>Strength:</div>
+						<div>{i.strength}</div>
+					</div>
+					<div class="statsCell">
+						<div>Endurance:</div>
+						<div>{i.endurance}</div>
+					</div>
+					<div class="statsCell">
+						<div>Perception:</div>
+						<div>{i.perception}</div>
+					</div>
+					<div class="statsCell">
+						<div>Intelligence:</div>
+						<div>{i.intelligence}</div>
+					</div>
+					<div class="statsCell">
+						<div>Agility:</div>
+						<div>{i.agility}</div>
+					</div>
+					<div class="statsCell">
+						<div>Accuracy:</div>
+						<div>{i.accuracy}</div>
+					</div>
+					<div class="statsCell">
+						<div>Charisma:</div>
+						<div>{i.charisma}</div>
+					</div>
 				</div>
-				<div class="statsCell">
-					<div>Intelligence:</div>
-					<div>{i.intelligence}</div>
+				<div class="cellHolder">
+					<div>{i.description}</div>
 				</div>
-				<div class="statsCell">
-					<div>Agility:</div>
-					<div>{i.agility}</div>
+				<div class="cellHolder">
+					<div>{i.ability}</div>
 				</div>
-				<div class="statsCell">
-					<div>Accuracy:</div>
-					<div>{i.accuracy}</div>
-				</div>
-				<div class="statsCell">
-					<div>Charisma:</div>
-					<div>{i.charisma}</div>
-				</div>
-			</div>
-			<div class="cellHolder">
-				<div>{i.description}</div>
-			</div>
-			<div class="cellHolder">
-				<div>{i.ability}</div>
 			</div>
 		</div>
 	{/if}
-</div>
+{/key}
 
 <style>
 	a {
@@ -262,11 +275,11 @@
 		font-weight: 400;
 	}
 	.item {
-		display: flex;
+		/* display: flex; */
 		flex-direction: column;
-		width: 15rem;
-		justify-content: space-between;
-		padding: 1rem;
+		width: 18rem;
+		/* justify-content: space-between; */
+		/* padding: 1rem; */
 		border: 3px solid black;
 		border-radius: 1rem;
 		@apply border-slate-500;

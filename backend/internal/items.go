@@ -16,6 +16,8 @@ type Item struct {
 	Accuracy     int    `json:"accuracy"`
 	Charisma     int    `json:"charisma"`
 	Quantity     int    `json:"quantity"`
+	Attack       int    `json:"attack"`
+	Defense      int    `json:"defense"`
 	Slot         int    `json:"slot"`
 }
 
@@ -48,8 +50,8 @@ func (srv *Service) GetItemsIDs() []int {
 }
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {
-	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, slot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Slot)
+	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, attack, defense, slot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Slot)
 	if err != nil {
 		return nil, err
 	}
@@ -74,11 +76,13 @@ func (srv *Service) UpdateItem(i Item) error {
 					accuracy=?,
 					charisma=?,
 					quantity=?,
+					attack=?,
+					defense=?,
 					slot=?
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Slot, i.Id)
+	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Slot, i.Id)
 	if err != nil {
 		return errors.Wrap(err, "failed to update item")
 	}
@@ -129,5 +133,5 @@ func (srv *Service) DeleteItem(id int) error {
 	if err != nil {
 		return err
 	}
-	return srv.ResetObjects(ItemType)
+	return srv.ResetObjects(ItemType, PlayerType)
 }

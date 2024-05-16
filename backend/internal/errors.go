@@ -11,4 +11,5 @@ var (
 	ErrItemAlreadyExists = errors.New("item already exists")
 	ErrInvalidRarity     = errors.New("invalid rarity")
 	ErrAlreadyEquipped   = errors.New("item is already equipped")
+	ErrEmptyName         = errors.New("name cant be empty")
 )

@@ -10,6 +10,10 @@
 	let bagItems = writable([]);
 	var menuItem: HTMLElement
 	onMount(async () => {
+		loadData()
+	});
+
+	async function loadData() {
 		menuItem = document.getElementById("menu-bag")!
 		if (menuItem != undefined) {
 			menuItem.classList.remove("btn-outline")
@@ -25,7 +29,7 @@
 			holder = data
 		}
 		GetPlayerNames()
-	});
+	}
 
 	onDestroy(() => {
 		if (menuItem != undefined) {
@@ -56,6 +60,12 @@
 				const res = await fetch(HOST + 'players-names');
 				const data = await res.json();
 				names = data
+	}
+
+	let restartKey = {};
+	const restart = () => {
+		restartKey = {}
+		loadData()
 	}
 
 	let showModal = false;
@@ -89,7 +99,7 @@
 <div class="flex flex-wrap gap-5 justify-center">
 	{#if $bagItems != null}
 	{#each $bagItems as item}
-		<Item id={item} bag={true} />
+		<Item id={item} bag={true} restart={restart}/>
 	{/each}
 	{:else}
 	<h1>No Items</h1>

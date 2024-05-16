@@ -7,6 +7,10 @@
 	let items = writable([]);
 	var menuItem: HTMLElement
 	onMount(async () => {
+		loadData()
+	});
+
+	async function loadData() {
 		menuItem = document.getElementById("menu-items")!
 		if (menuItem != undefined) {
 			menuItem.classList.remove("btn-ghost")
@@ -17,7 +21,7 @@
 		const res = await fetch(HOST + 'items');
 		const data = await res.json();
 		items.set(data);
-	});
+	}
 
 	onDestroy(() => {
 		if (menuItem != undefined) {
@@ -26,15 +30,23 @@
 			menuItem.classList.remove("btn-primary")
 		}
 	})
+
+	let restartKey = {};
+	const restart = () => {
+		restartKey = {}
+		loadData()
+	}
 </script>
 
 {#if $items != null}
 	<div class="flex justify-center pb-6">
 		<span class="text-3xl">Items</span>
 	</div>
-	<div class="flex flex-wrap gap-5 justify-center">
+	<div class="flex flex-wrap flex-row gap-5 justify-center">
 		{#each $items as item}
-			<Item id={item} />
+		<div>
+			<Item id={item} restart={restart}/>
+		</div>
 		{/each}
 	</div>
 	{:else}

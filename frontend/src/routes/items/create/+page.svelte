@@ -38,6 +38,8 @@
         accuracy: parseInt(formData.get("accuracy")!.toString()),
         charisma: parseInt(formData.get("charisma")!.toString()),
         quantity: parseInt(formData.get("quantity")!.toString()),
+        attack: parseInt(formData.get("attack")!.toString()),
+        defense: parseInt(formData.get("defense")!.toString()),
         slot: slotMap.get(formData.get("slot")!.toString())
       }
 
@@ -67,6 +69,16 @@
         <label for="ability">Ability</label>  
         <div>
         <input id="ability" name="ability" type="text" class="input input-bordered w-full max-w-xs">
+        </div>
+
+        <label for="attack">Attack</label>  
+        <div>
+        <input id="attack" name="attack" type="number" class="input input-bordered w-full max-w-xs">
+        </div>
+
+        <label for="defense">Defense</label>  
+        <div >
+        <input id="defense" name="defense" type="number" class="input input-bordered w-full max-w-xs">
         </div>
 
         <label for="rarity">Rarity</label>  

@@ -12,9 +12,12 @@ import (
 func CreateItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var item internal.Item
-		data := ctx.Body()
-		if err := json.Unmarshal(data, &item); err != nil {
+		if err := json.Unmarshal(ctx.Body(), &item); err != nil {
 			return errors.Wrap(err, "CreateItemRoute")
+		}
+
+		if item.Name == "" {
+			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
 		}
 
 		err := internal.IsValidRarity(item.Rarity)
@@ -58,6 +61,10 @@ func UpdateItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		var item internal.Item
 		if err := json.Unmarshal(ctx.Body(), &item); err != nil {
 			return errors.Wrap(err, "UpdateItemRoute")
+		}
+
+		if item.Name == "" {
+			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
 		}
 
 		err := srv.UpdateItem(item)

@@ -38,28 +38,30 @@ func NewService(db *sql.DB) (*Service, error) {
 	return srv, err
 }
 
-func (srv *Service) ResetObjects(t ObjectType) error {
-	switch t {
-	case PlayerType:
-		players, err := srv.GetPlayersFromDB()
-		if err != nil {
-			return errors.Wrap(err, "ResetObjects: GetPlayersFromDB")
+func (srv *Service) ResetObjects(types ...ObjectType) error {
+	for _, t := range types {
+		switch t {
+		case PlayerType:
+			players, err := srv.GetPlayersFromDB()
+			if err != nil {
+				return errors.Wrap(err, "ResetObjects: GetPlayersFromDB")
+			}
+			srv.players = players
+		case ItemType:
+			items, err := srv.GetItemsFromDB()
+			if err != nil {
+				return errors.Wrap(err, "ResetObjects: GetItemsFromDB")
+			}
+			srv.items = items
+		case BagType:
+			bag, err := srv.GetBagFromDB()
+			if err != nil {
+				return errors.Wrap(err, "ResetObjects: GetBagFromDB")
+			}
+			srv.bag = bag
+		default:
+			return errors.New("unknown object type")
 		}
-		srv.players = players
-	case ItemType:
-		items, err := srv.GetItemsFromDB()
-		if err != nil {
-			return errors.Wrap(err, "ResetObjects: GetItemsFromDB")
-		}
-		srv.items = items
-	case BagType:
-		bag, err := srv.GetBagFromDB()
-		if err != nil {
-			return errors.Wrap(err, "ResetObjects: GetBagFromDB")
-		}
-		srv.bag = bag
-	default:
-		return errors.New("unknown object type")
 	}
 	return nil
 }

@@ -110,6 +110,8 @@ func createTablesMysql(tx *sql.Tx) error {
 			accuracy INTEGER,
 			charisma INTEGER,
 			quantity INTEGER,
+			attack INTEGER,
+			defense INTEGER,
 			slot INTEGER DEFAULT 0,
 			PRIMARY KEY (id)
  	);`
