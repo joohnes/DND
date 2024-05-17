@@ -23,7 +23,8 @@ type Player struct {
 	Agility      int    `json:"agility"`
 	Accuracy     int    `json:"accuracy"`
 	Charisma     int    `json:"charisma"`
-	Session      int    `json:"-"`
+	AlcoholLevel int    `json:"alcohol_level"`
+	Zgon         bool   `json:"zgon"`
 	Equipped     []int  `json:"equipped"`
 	Items        []int  `json:"items"`
 }
@@ -155,6 +156,20 @@ func (srv *Service) GetPlayerByID(id int) *Player {
 	return nil
 }
 
+func (srv *Service) ToggleZgon(playerID int) error {
+	if p := srv.GetPlayerByID(playerID); p == nil {
+		return errors.Wrap(ErrNoPlayer, "toggle zgon")
+	}
+
+	query := "UPDATE players SET zgon = NOT zgon WHERE id = ?"
+	_, err := srv.db.Exec(query, playerID)
+	if err != nil {
+		return errors.Wrap(err, "failed to toggle zgon")
+	}
+
+	return errors.Wrap(srv.ResetObjects(PlayerType), "toggle zgon")
+}
+
 func (srv *Service) ChangeHPandMana(id int, hpmana HPMana) error {
 	query := "UPDATE players SET health=?, mana=? WHERE id=?"
 	_, err := srv.db.Exec(query, hpmana.HP, hpmana.Mana, id)
@@ -165,8 +180,8 @@ func (srv *Service) ChangeHPandMana(id int, hpmana HPMana) error {
 }
 
 func (srv *Service) CreatePlayer(p Player) (*Player, error) {
-	query := "INSERT INTO players (name, level, class, race, subrace, strength, endurance, perception, intelligence, agility, accuracy, charisma, health, mana, session) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 100, 100, ?)"
-	res, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.Session)
+	query := "INSERT INTO players (name, level, class, race, subrace, strength, endurance, perception, intelligence, agility, accuracy, charisma) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma)
 	id, _ := res.LastInsertId()
 	p.Id = int(id)
 	p.Health = 100
@@ -190,11 +205,11 @@ func (srv *Service) UpdatePlayer(p Player) error {
 					agility=?,
 					accuracy=?,
 					charisma=?,
-					session=?
+					alcohol_level=?
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.Session, p.Id)
+	_, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma, p.AlcoholLevel, p.Id)
 	if err != nil {
 		return errors.Wrap(err, "failed to update player")
 	}
@@ -243,7 +258,8 @@ func (srv *Service) GetPlayersFromDB() ([]*Player, error) {
 			&p.Class,
 			&p.Race,
 			&p.Subrace,
-			&p.Session,
+			&p.AlcoholLevel,
+			&p.Zgon,
 		); err != nil {
 			return nil, err
 		}

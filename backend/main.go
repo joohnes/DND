@@ -50,6 +50,8 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Delete("/player/drop-item/:itemID", routes.DropItemRoute(srv))
 	app.Put("/player/hpmana/:id", routes.ChangeHPandManaRoute(srv))
 	app.Get("/player/items/:playerID", routes.GetPlayerItemsRoute(srv))
+	app.Post("/alcohol", routes.AlcoholLevelDownRoute(srv))
+	app.Post("/player/zgon/:playerID", routes.ToggleZgonRoute(srv))
 
 	// item
 	app.Post("/item", routes.CreateItemRoute(srv))

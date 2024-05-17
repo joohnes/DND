@@ -48,6 +48,8 @@ declare global {
 		session?: number;
 		items?: number[];
 		equipped?: number[];
+		alcohol_level?: number;
+		zgon: boolean;
 	}
 
 	interface Bag {

@@ -84,108 +84,12 @@ func (srv *Service) ItemExists(id int) bool {
 	return false
 }
 
-func (srv *Service) TestObjects() {
-	srv.players = append(srv.players, &Player{
-		Id:           1,
-		Name:         "Test",
-		Level:        3,
-		Health:       100,
-		Mana:         100,
-		Strength:     10,
-		Endurance:    10,
-		Perception:   10,
-		Intelligence: 10,
-		Agility:      10,
-		Accuracy:     10,
-		Charisma:     10,
-		Class:        "Warrior",
-		Race:         "zjeb",
-		Subrace:      "zjeb",
-		Session:      1,
-		Items:        []int{69, 1337, 2137},
-	})
-	srv.players = append(srv.players, &Player{
-		Id:           2,
-		Name:         "Test2",
-		Level:        69,
-		Health:       69,
-		Mana:         100,
-		Strength:     10,
-		Endurance:    10,
-		Perception:   10,
-		Intelligence: 10,
-		Agility:      10,
-		Accuracy:     10,
-		Charisma:     10,
-		Class:        "Warrior",
-		Race:         "zjeb",
-		Subrace:      "zjeb",
-		Session:      1,
-		Items:        []int{69, 1337, 2137},
-	})
-	srv.players = append(srv.players, &Player{
-		Id:           3,
-		Name:         "Test3",
-		Level:        131,
-		Health:       1,
-		Mana:         69,
-		Strength:     10,
-		Endurance:    10,
-		Perception:   10,
-		Intelligence: 10,
-		Agility:      10,
-		Accuracy:     10,
-		Charisma:     10,
-		Class:        "Warrior",
-		Race:         "zjeb",
-		Subrace:      "zjeb",
-		Session:      1,
-		Items:        []int{69, 1337, 2137},
-	})
+func (srv *Service) AlcoholLevelDown() error {
+	query := "UPDATE players SET alcohol_level = alcohol_level - 1 WHERE alcohol_level > 0"
+	_, err := srv.db.Exec(query)
+	if err != nil {
+		return err
+	}
 
-	srv.items = append(srv.items, &Item{
-		Id:           1,
-		Name:         "Test1",
-		Description:  "Test description",
-		Ability:      "test ability",
-		Rarity:       "Common",
-		Strength:     10,
-		Endurance:    10,
-		Perception:   10,
-		Intelligence: 10,
-		Agility:      10,
-		Accuracy:     10,
-		Charisma:     10,
-		Quantity:     53,
-	})
-	srv.items = append(srv.items, &Item{
-		Id:           2,
-		Name:         "Test2",
-		Description:  "Test description",
-		Ability:      "test ability",
-		Rarity:       "Legendary",
-		Strength:     10,
-		Endurance:    10,
-		Perception:   10,
-		Intelligence: 10,
-		Agility:      10,
-		Accuracy:     10,
-		Charisma:     10,
-		Quantity:     53,
-	})
-	srv.items = append(srv.items, &Item{
-		Id:           3,
-		Name:         "Test3",
-		Description:  "Test description",
-		Ability:      "test ability",
-		Rarity:       "Artefact",
-		Strength:     10,
-		Endurance:    10,
-		Perception:   10,
-		Intelligence: 10,
-		Agility:      10,
-		Accuracy:     10,
-		Charisma:     10,
-		Quantity:     53,
-	})
+	return srv.ResetObjects(PlayerType)
 }

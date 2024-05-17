@@ -5,6 +5,7 @@
   	import { HOST } from "$lib/host";
 
 	let p: Player;
+	let min = 1
 	onMount(async function () {
 		const res = await fetch(HOST + 'player/' + id);
 		const data = await res.json();
@@ -24,7 +25,12 @@
 			agility: data.agility,
 			accuracy: data.accuracy,
 			charisma: data.charisma,
+			alcohol_level: data.alcohol_level,
+			zgon: data.zgon
 		};
+		if (GetAlcoRange().length > 5) {
+			min = 0
+		}
 	});
 
 	let hp: number;
@@ -38,32 +44,96 @@
         method: "PUT",
         body: JSON.stringify(data)
       })
-      window.location.href = window.location.origin + "/players"
+	  showModal = false
+      restart()
 	}
 
 	async function DeletePlayer() {
 		fetch(HOST + "player/" + p.id, {
         method: "DELETE",
 		})
-		window.location.href = window.location.origin + "/players"
+		restart()
+	}
+
+	function GetAlcoRange() {
+		if (p.alcohol_level == undefined) {
+			return [1, 2, 3, 4, 5]
+		}
+		if (p.alcohol_level <= 5) {
+			return [0, 1, 2, 3, 4, 5]
+		} else if (p.alcohol_level <= 10) {
+			return [6, 7, 8, 9, 10]
+		} else if (p.alcohol_level <= 15) {
+			return [11, 12, 13, 14, 15]
+		} else if (p.alcohol_level <= 20) {
+			return [16, 17, 18, 19, 20]
+		} else if (p.alcohol_level <= 25) {
+			return [21, 22, 23, 24, 25]
+		} else if (p.alcohol_level <= 30) {
+			return [26, 27, 28, 29, 30]
+		} else {
+			return [1, 2, 3, 4, 5]
+		}
+	}
+
+	function GetAlcoColor() {
+		if (p.alcohol_level == undefined || p.alcohol_level <= 1) {
+			return ""
+		} else if (p.alcohol_level == 2) {
+			return "range-success"
+		} else if (p.alcohol_level < 10) {
+			return "range-warning"
+		} else if (p.alcohol_level == 10) {
+			return "range-info"
+		} else {
+			return "range-error"
+		}
+	}
+
+	function ConvertAlcoLevel() {
+		if (p.alcohol_level == undefined) {
+			return 0
+		}
+		let lvl = p.alcohol_level
+		while (true) {
+			if (lvl > 5) {
+				lvl -= 5
+			} else {
+				return lvl
+			}
+		}
+	}
+
+	async function Zgon() {
+		await fetch(HOST + "player/zgon/" + p.id, {
+			method: "POST"
+		})
+		showModal = false;
+		restart()
 	}
 
 	let showModal: boolean;
 	let modalUpdate: boolean;
 	let modalEq: boolean;
 	export let id: number = 0;
+	export let restart: Function;
 </script>
 {#if modalUpdate}
 <Modal bind:showModal>
 	<div class="flex flex-col justify-center items-center">
 	<h2>Enter new HP and MANA</h2>
-	<div class="flex flex-col py-2">
-		<label for="hp">HP</label>
-		<input type="number" id="hp" name="hp" class="input input-sm input-bordered w-20" bind:value={hp}>
-		<label for="mana">MANA</label>
-		<input type="number" id="mana" name="mana" class="input input-sm input-bordered w-20" bind:value={mana}>
+	<div class="flex flex-col py-2 gap-4">
+		<div class="flex gap-4 justify-between">
+			<label for="hp" class="my-auto">HP</label>
+			<input type="number" id="hp" name="hp" class="input input-sm input-bordered w-20" bind:value={hp}>
+		</div>
+		<div class="flex gap-4 justify-between">
+			<label for="mana" class="my-auto">MANA</label>
+			<input type="number" id="mana" name="mana" class="input input-sm input-bordered w-20" bind:value={mana}>
+		</div>
 	</div>
-	<button class="btn" on:click={()=> {UpdateHPMANA()}}>Update</button>
+	<button class="btn btn-outline btn-success px-12 mb-2" on:click={()=> {UpdateHPMANA()}}>Update</button>
+	<button on:click={Zgon} class="btn btn-outline px-14 btn-secondary">Zgon</button>
 </div>
 </Modal>
 {:else if !modalUpdate && !modalEq}
@@ -79,7 +149,7 @@
 </Modal>
 {/if}
 {#if p != undefined}
-	<div class="player">
+	<div class="player {p.zgon ? "grayscale" : ""}">
 		<div class="info">
 			<div>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -87,9 +157,12 @@
 				<span on:click={()=>{modalUpdate=false;modalEq=true;showModal = true}}>[EQ]</span>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<span on:click={()=>{modalUpdate=true;modalEq=false;showModal = true}}><span class="text-red-500">HP</span><span class="text-blue-600">MANA</span></span>
+				<span on:click={()=>{modalUpdate=true;modalEq=false;showModal = true}}><span class="text-red-500">HP</span><span class="text-blue-600">MANA<span class="text-gray-400">ZGON</span></span></span>
 			</div>
 			<div>
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<span on:click={Zgon}>💀</span>
 				<a href={window.location.origin+"/players/update/"+id}>⚙️</a>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -110,6 +183,18 @@
 			<div class="badge badge-outline badge-secondary">HP {p.health}</div>
 			<div class="badge badge-outline badge-info">MANA {p.mana}</div>
 		</div>
+
+		{#if p.alcohol_level != undefined}
+		<div class="cellHolder flex-col">
+			<input type="range" disabled min={min} max="5" value={ConvertAlcoLevel()} class="range range-xs mb-1 {GetAlcoColor()}" step="1" />
+				<div class="w-full flex justify-between text-xs px-2">
+					{#each GetAlcoRange() as i}
+						<span>{i}</span>
+					{/each}
+			</div>
+		</div>
+		{/if}
+
 		<div class="cellHolder flex-col">
 			<div class="statsCell">
 				<div>Strength:</div>

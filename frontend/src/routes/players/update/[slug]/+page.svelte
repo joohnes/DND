@@ -21,7 +21,8 @@
         intelligence: parseInt(formData.get("intelligence")!.toString()),
         agility: parseInt(formData.get("agility")!.toString()),
         accuracy: parseInt(formData.get("accuracy")!.toString()),
-        charisma: parseInt(formData.get("charisma")!.toString())
+        charisma: parseInt(formData.get("charisma")!.toString()),
+        alcohol_level: parseInt(formData.get("alcohol_level")!.toString())
       }
 
       fetch(HOST + "player/" + id, {
@@ -51,7 +52,8 @@
         accuracy: data.accuracy,
         charisma: data.charisma,
         session: data.session,
-        items: data.items
+        items: data.items,
+        alcohol_level: data.alcohol_level
       };
     });
   </script>
@@ -77,18 +79,25 @@
             </div>
           
           
-            <label  for="race">Race</label>
+            <label for="race">Race</label>
             <div >
               <input id="race" name="race" type="text" value={p.race} class="input input-bordered w-full max-w-xs">
             </div>
           
           
-            <label  for="subrace">Subrace</label>
+            <label for="subrace">Subrace</label>
             <div >
               <input id="subrace" name="subrace" type="text" value={p.subrace} class="input input-bordered w-full max-w-xs">
             </div>
+
+            <label for="alcohol_level">Alcohol Level</label>  
+            <div >
+              <input id="alcohol_level" name="alcohol_level" type="number" value={p.alcohol_level} class="input input-bordered w-full max-w-xs">
+            </div>
+
           </div>
           <div>
+
             <label  for="strength">Strength</label>  
             <div >
               <input id="strength" name="strength" type="number" value={p.strength} class="input input-bordered w-full max-w-xs">
@@ -130,7 +139,7 @@
             </div>
           </div>
         </div>
-    <button class="btn"><input type="submit" value="Create"></button>
+        <button class="btn"><input type="submit" value="Update"></button>
       </fieldset>
       </form>
     </div>  

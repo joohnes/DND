@@ -7,6 +7,10 @@
 	let players = writable([]);
 	var menuItem: HTMLElement
 	onMount(async () => {
+		loadData()
+	});
+
+	async function loadData() {
 		menuItem = document.getElementById("menu-players")!
 		if (menuItem != undefined) {
 			menuItem.classList.remove("btn-ghost")
@@ -17,7 +21,7 @@
 		const res = await fetch(HOST + 'players');
 		const data = await res.json();
 		players.set(data);
-	});
+	}
 	
 	onDestroy(() => {
 		if (menuItem != undefined) {
@@ -27,14 +31,21 @@
 		}
 	})
 
+	let restartKey = {};
+	const restart = () => {
+		restartKey = {}
+		loadData()
+	}
+
 </script>
+{#key restartKey}
 {#if $players != null}
 	<div class="flex justify-center pb-6">
-		<span class="text-3xl">Players</span>
+		<span class="text-3xl my-auto">Players</span>
 	</div>
 	<div class="flex flex-wrap gap-5 justify-center">
 		{#each $players as player}
-			<Player id={player} />
+			<Player id={player} restart={restart}/>
 		{/each}
 	</div>
 	{:else}
@@ -42,4 +53,4 @@
 		<span class="text-3xl">No Players</span>
 	</div>
 {/if}
-
+{/key}

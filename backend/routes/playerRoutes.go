@@ -161,3 +161,27 @@ func GetPlayerItemsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		return ctx.JSON(srv.GetPlayerByID(playerID).GetItems())
 	}
 }
+
+func AlcoholLevelDownRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		err := srv.AlcoholLevelDown()
+		if err != nil {
+			return errors.Wrap(err, "AlcoholLevelDownRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
+	}
+}
+
+func ToggleZgonRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
+		playerID, err := strconv.Atoi(ctx.Params("playerID"))
+
+		err = srv.ToggleZgon(playerID)
+		if err != nil {
+			return errors.Wrap(err, "ToggleZgonRoute")
+		}
+
+		return ctx.SendStatus(fiber.StatusOK)
+	}
+}

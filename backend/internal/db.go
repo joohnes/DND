@@ -75,8 +75,8 @@ func createTablesMysql(tx *sql.Tx) error {
 		id INTEGER AUTO_INCREMENT,
 		name TEXT,
 		level INTEGER,
-		health INTEGER,
-		mana INTEGER,
+		health INTEGER DEFAULT 100,
+		mana INTEGER DEFAULT 100,
 		strength INTEGER,
 		endurance INTEGER,
 		perception INTEGER,
@@ -87,7 +87,8 @@ func createTablesMysql(tx *sql.Tx) error {
 		class TEXT,
 		race TEXT,
 		subrace TEXT,
-		session INTEGER,
+		alcohol_level INTEGER DEFAULT 0,
+		zgon BOOLEAN DEFAULT FALSE,
 		PRIMARY KEY (id)
 );`
 	_, err := tx.Exec(query)
