@@ -113,6 +113,7 @@ func createTablesMysql(tx *sql.Tx) error {
 			quantity INTEGER,
 			attack INTEGER,
 			defense INTEGER,
+			permille INTEGER,
 			slot INTEGER DEFAULT 0,
 			PRIMARY KEY (id)
  	);`

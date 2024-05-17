@@ -22,11 +22,12 @@ declare global {
 		agility: number;
 		accuracy: number;
 		charisma: number;
-		owner?: number;
 		quantity: number;
 		attack: number;
 		defense: number;
+		permille: number;
 		slot?: number;
+		owner: string;
 	}
 
 	interface Player {
@@ -49,7 +50,7 @@ declare global {
 		items?: number[];
 		equipped?: number[];
 		alcohol_level?: number;
-		zgon: boolean;
+		zgon?: boolean;
 	}
 
 	interface Bag {

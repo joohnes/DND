@@ -23,7 +23,9 @@
 			quantity: data.quantity,
 			attack: data.attack,
 			defense: data.defense,
-			slot: data.slot
+			permille: data.permille,
+			slot: data.slot,
+			owner: data.owner,
 		};
 		GetPlayerNames()
 	});
@@ -200,11 +202,15 @@
 	{#if i != undefined}
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<div class="item collapse collapse-arrow" tabindex="0">
+			<input type="checkbox"/>
 			<div class="info collapse-title">
 				<div>
 					<div class="underline underline-offset-4">{i.name} x{i.quantity}</div>
+					{#if i.owner != ""}
+						<div>Owner: {i.owner}</div>
+					{/if}
 				</div>
-				<div>
+				<div style="z-index: 40!important;">
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -219,14 +225,17 @@
 			<div class="collapse-content">
 				<div class="cellHolder">
 					<div class="badge badge-ghost badge-outline {rarityColorMap.get(i.rarity)}">{i.rarity}</div>
+					{#if i.slot != undefined}
+						<div class="badge badge-ghost badge-outline">{slotMap.get(i.slot)}</div>
+					{/if}
 				</div>
-				{#if i.slot != undefined}
 				<div class="cellHolder">
-					<div class="badge badge-ghost badge-outline">{slotMap.get(i.slot)}</div>
-					<div class="badge badge-secondary badge-outline">ATK {i.attack}</div>
-					<div class="badge badge-info badge-outline">DEF {i.defense}</div>
+					<div class="badge badge-outline badge-accent my-auto">{i.permille}‰</div>
+					<div>
+						<div class="badge badge-secondary badge-outline">ATK {i.attack}</div>
+						<div class="badge badge-info badge-outline">DEF {i.defense}</div>
+					</div>
 				</div>
-				{/if}
 				<div class="cellHolder flex-col">
 					<div class="statsCell">
 						<div>Strength:</div>

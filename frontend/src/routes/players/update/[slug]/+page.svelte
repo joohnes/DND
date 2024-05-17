@@ -73,21 +73,41 @@
               <input id="level" name="level" type="number" value={p.level} class="input input-bordered w-full max-w-xs">
             </div>
           
-            <label class="" for="class">Class</label>
+            <label for="class">Class</label>  
             <div>
-              <input id="class" name="class" type="text" value={p.class} class="input input-bordered w-full max-w-xs">
+              <select name="class" value={p.class} class="select select-bordered w-full max-w-xs">
+                <option disabled selected>Choose class</option>
+                <option>Common</option>
+                <option>Rare</option>
+                <option>Epic</option>
+                <option>Legendary</option>
+                <option>Artefact</option>
+              </select>
+            </div>
+          
+            <label for="race">Race</label>  
+            <div>
+              <select name="race" value={p.race} class="select select-bordered w-full max-w-xs">
+                <option disabled selected>Choose race</option>
+                <option>Common</option>
+                <option>Rare</option>
+                <option>Epic</option>
+                <option>Legendary</option>
+                <option>Artefact</option>
+              </select>
             </div>
           
           
-            <label for="race">Race</label>
-            <div >
-              <input id="race" name="race" type="text" value={p.race} class="input input-bordered w-full max-w-xs">
-            </div>
-          
-          
-            <label for="subrace">Subrace</label>
-            <div >
-              <input id="subrace" name="subrace" type="text" value={p.subrace} class="input input-bordered w-full max-w-xs">
+            <label for="subrace">Subrace</label>  
+            <div>
+              <select name="subrace" value={p.subrace} class="select select-bordered w-full max-w-xs">
+                <option disabled selected>Choose subrace</option>
+                <option>Common</option>
+                <option>Rare</option>
+                <option>Epic</option>
+                <option>Legendary</option>
+                <option>Artefact</option>
+              </select>
             </div>
 
             <label for="alcohol_level">Alcohol Level</label>  
@@ -139,7 +159,9 @@
             </div>
           </div>
         </div>
-        <button class="btn"><input type="submit" value="Update"></button>
+        <div class="flex justify-center mt-4">
+          <button class="btn btn-outline btn-primary px-8"><input type="submit" value="Update"></button>
+        </div>
       </fieldset>
       </form>
     </div>  

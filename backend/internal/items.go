@@ -18,7 +18,9 @@ type Item struct {
 	Quantity     int    `json:"quantity"`
 	Attack       int    `json:"attack"`
 	Defense      int    `json:"defense"`
+	Permille     int    `json:"permille"` // promile
 	Slot         int    `json:"slot"`
+	Owner        string `json:"owner"`
 }
 
 func IsValidRarity(rarity string) error {
@@ -29,13 +31,25 @@ func IsValidRarity(rarity string) error {
 	return ErrInvalidRarity
 }
 
-func (srv *Service) GetItemByID(id int) *Item {
-	for _, item := range srv.items {
-		if item.Id == id {
-			return item
+func (srv *Service) getOwner(itemID int) string {
+	for _, p := range srv.players {
+		if p.IsInEquipment(itemID) {
+			return p.Name
 		}
 	}
-	return nil
+	return ""
+}
+
+func (srv *Service) GetItemByID(id int) (Item, error) {
+	for _, item := range srv.items {
+		if item.Id == id {
+			i := *item
+			i.Owner = srv.getOwner(i.Id)
+			return i, nil
+		}
+	}
+
+	return Item{}, ErrNoItem
 }
 
 func (srv *Service) GetItemsIDs() []int {
@@ -50,8 +64,8 @@ func (srv *Service) GetItemsIDs() []int {
 }
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {
-	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, attack, defense, slot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Slot)
+	query := "INSERT INTO items (name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, attack, defense, permille, slot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Permille, i.Slot)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +92,7 @@ func (srv *Service) UpdateItem(i Item) error {
 					quantity=?,
 					attack=?,
 					defense=?,
+					permille=?,
 					slot=?
 				WHERE
 					id=?;
@@ -90,7 +105,7 @@ func (srv *Service) UpdateItem(i Item) error {
 }
 
 func (srv *Service) GetItemsFromDB() ([]*Item, error) {
-	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, slot FROM items"
+	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, attack, defense, permille, slot FROM items"
 	rows, err := srv.db.Query(query)
 	defer func() { rows.Close() }()
 	if err != nil {
@@ -114,6 +129,9 @@ func (srv *Service) GetItemsFromDB() ([]*Item, error) {
 			&i.Accuracy,
 			&i.Charisma,
 			&i.Quantity,
+			&i.Attack,
+			&i.Defense,
+			&i.Permille,
 			&i.Slot,
 		)
 

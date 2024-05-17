@@ -10,7 +10,9 @@
   })
 
   onDestroy(() => {
-		menuItem.classList.add("btn-outline")
+    if (menuItem != undefined) {
+      menuItem.classList.add("btn-outline")
+    }
 	})
 
   let slotMap = new Map<string, number>([
@@ -40,6 +42,7 @@
         quantity: parseInt(formData.get("quantity")!.toString()),
         attack: parseInt(formData.get("attack")!.toString()),
         defense: parseInt(formData.get("defense")!.toString()),
+        permille: parseInt(formData.get("permille")!.toString()),
         slot: slotMap.get(formData.get("slot")!.toString())
       }
 
@@ -62,14 +65,14 @@
         </div>
       
         <label for="description">Description</label>  
-        <div>
-        <input id="description" name="description" type="text" class="input input-bordered w-full max-w-xs">
-        </div>
-      
-        <label for="ability">Ability</label>  
-        <div>
-        <input id="ability" name="ability" type="text" class="input input-bordered w-full max-w-xs">
-        </div>
+            <div>
+            <textarea name="description" class="textarea textarea-bordered w-full" />
+            </div>
+          
+            <label for="ability">Ability</label>  
+            <div>
+            <textarea name="ability" class="textarea textarea-bordered w-full" />
+            </div>
 
         <label for="attack">Attack</label>  
         <div>
@@ -79,6 +82,11 @@
         <label for="defense">Defense</label>  
         <div >
         <input id="defense" name="defense" type="number" class="input input-bordered w-full max-w-xs">
+        </div>
+
+        <label for="permille">Permille</label>  
+        <div >
+        <input id="permille" name="permille" type="number" class="input input-bordered w-full max-w-xs">
         </div>
 
         <label for="rarity">Rarity</label>  
@@ -149,7 +157,9 @@
         </div>
       </div>
       </div>
-      <button class="btn"><input type="submit" value="Create"></button>
+      <div class="flex justify-center mt-4">
+        <button class="btn btn-outline btn-primary px-8"><input type="submit" value="Create"></button>
+      </div>
     </fieldset>
     </form>
     </div>

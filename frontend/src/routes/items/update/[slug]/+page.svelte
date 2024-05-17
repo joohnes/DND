@@ -42,6 +42,7 @@
         quantity: parseInt(formData.get("quantity")!.toString()),
         attack: parseInt(formData.get("attack")!.toString()),
         defense: parseInt(formData.get("defense")!.toString()),
+        permille: parseInt(formData.get("permille")!.toString()),
         slot: slotMap.get(formData.get("slot")!.toString())
       }
 
@@ -71,6 +72,7 @@
         quantity: data.quantity,
         attack: data.attack,
         defense: data.defense,
+        permille: data.permille,
         slot: data.slot
       };
     });
@@ -88,12 +90,12 @@
           
             <label for="description">Description</label>  
             <div>
-            <textarea name="description" class="textarea textarea-bordered w-full" value={i.description}></textarea>
+            <textarea name="description" class="textarea textarea-bordered w-full" value={i.description} />
             </div>
           
             <label for="ability">Ability</label>  
             <div>
-            <textarea name="ability" class="textarea textarea-bordered w-full" value={i.ability}></textarea>
+            <textarea name="ability" class="textarea textarea-bordered w-full" value={i.ability} />
             </div>
 
             <label for="attack">Attack</label>  
@@ -104,6 +106,11 @@
             <label for="defense">Defense</label>  
             <div >
             <input id="defense" name="defense" type="number" value={i.defense} class="input input-bordered w-full max-w-xs">
+            </div>
+
+            <label for="permille">Permille</label>  
+            <div >
+            <input id="permille" name="permille" type="number" value={i.permille} class="input input-bordered w-full max-w-xs">
             </div>
     
             <label for="rarity">Rarity</label>  
@@ -174,7 +181,9 @@
             </div>
           </div>
           </div>
-          <button class="btn"><input type="submit" value="Create"></button>
+          <div class="flex justify-center mt-4">
+            <button class="btn btn-outline btn-primary px-8"><input type="submit" value="Update"></button>
+          </div>
         </fieldset>
         </form>
         </div>

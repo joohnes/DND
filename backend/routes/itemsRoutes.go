@@ -47,9 +47,9 @@ func GetItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(err, "GetItemRoute")
 		}
 
-		i := srv.GetItemByID(id)
-		if i == nil {
-			return errors.Wrap(internal.ErrNoItem, "GetItemRoute")
+		i, err := srv.GetItemByID(id)
+		if err != nil {
+			return errors.Wrap(err, "GetItemRoute")
 		}
 
 		return ctx.JSON(i)

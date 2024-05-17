@@ -133,7 +133,6 @@
 		</div>
 	</div>
 	<button class="btn btn-outline btn-success px-12 mb-2" on:click={()=> {UpdateHPMANA()}}>Update</button>
-	<button on:click={Zgon} class="btn btn-outline px-14 btn-secondary">Zgon</button>
 </div>
 </Modal>
 {:else if !modalUpdate && !modalEq}
@@ -157,7 +156,10 @@
 				<span on:click={()=>{modalUpdate=false;modalEq=true;showModal = true}}>[EQ]</span>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<span on:click={()=>{modalUpdate=true;modalEq=false;showModal = true}}><span class="text-red-500">HP</span><span class="text-blue-600">MANA<span class="text-gray-400">ZGON</span></span></span>
+				<span on:click={()=>{modalUpdate=true;modalEq=false;showModal = true}}>
+					<span class="text-red-500">HP<span class="text-blue-600">MANA</span></span>
+					
+				</span>
 			</div>
 			<div>
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -181,6 +183,9 @@
 		</div>
 		<div class="cellHolder">
 			<div class="badge badge-outline badge-secondary">HP {p.health}</div>
+			{#if p.zgon}
+				<div class="badge badge-outline">zgon</div>
+			{/if}
 			<div class="badge badge-outline badge-info">MANA {p.mana}</div>
 		</div>
 

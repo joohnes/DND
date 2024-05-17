@@ -53,23 +53,44 @@
           <div>
             <input id="level" name="level" type="number" class="input input-bordered w-full max-w-xs">
           </div>
-        
-          <label class="" for="class">Class</label>
+
+          <label for="class">Class</label>  
           <div>
-            <input id="class" name="class" type="text" class="input input-bordered w-full max-w-xs">
+            <select name="class" class="select select-bordered w-full max-w-xs">
+              <option disabled selected>Choose class</option>
+              <option>Common</option>
+              <option>Rare</option>
+              <option>Epic</option>
+              <option>Legendary</option>
+              <option>Artefact</option>
+            </select>
+          </div>
+        
+          <label for="race">Race</label>  
+          <div>
+            <select name="race" class="select select-bordered w-full max-w-xs">
+              <option disabled selected>Choose race</option>
+              <option>Common</option>
+              <option>Rare</option>
+              <option>Epic</option>
+              <option>Legendary</option>
+              <option>Artefact</option>
+            </select>
           </div>
         
         
-          <label  for="race">Race</label>
-          <div >
-            <input id="race" name="race" type="text" class="input input-bordered w-full max-w-xs">
+          <label for="subrace">Subrace</label>  
+          <div>
+            <select name="subrace" class="select select-bordered w-full max-w-xs">
+              <option disabled selected>Choose subrace</option>
+              <option>Common</option>
+              <option>Rare</option>
+              <option>Epic</option>
+              <option>Legendary</option>
+              <option>Artefact</option>
+            </select>
           </div>
-        
-        
-          <label  for="subrace">Subrace</label>
-          <div >
-            <input id="subrace" name="subrace" type="text" class="input input-bordered w-full max-w-xs">
-          </div>
+
         </div>
         <div>
           <label  for="strength">Strength</label>  
@@ -114,7 +135,9 @@
           </div>
         </div>
       </div>
-  <button class="btn"><input type="submit" value="Create"></button>
+      <div class="flex justify-center mt-4">
+        <button class="btn btn-outline btn-primary px-8"><input type="submit" value="Create"></button>
+      </div>
     </fieldset>
     </form>
   </div>
