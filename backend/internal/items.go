@@ -97,7 +97,7 @@ func (srv *Service) UpdateItem(i Item) error {
 				WHERE
 					id=?;
 	`
-	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Slot, i.Id)
+	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Permille, i.Slot, i.Id)
 	if err != nil {
 		return errors.Wrap(err, "failed to update item")
 	}

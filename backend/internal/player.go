@@ -29,6 +29,28 @@ type Player struct {
 	Items        []int  `json:"items"`
 }
 
+type PlayerResponse struct {
+	Id           int    `json:"id"`
+	Name         string `json:"name"`
+	Level        int    `json:"level"`
+	Health       int    `json:"health"`
+	Mana         int    `json:"mana"`
+	Class        string `json:"class"`
+	Race         string `json:"race"`
+	Subrace      string `json:"subrace"`
+	Strength     string `json:"strength"`
+	Endurance    string `json:"endurance"`
+	Perception   string `json:"perception"`
+	Intelligence string `json:"intelligence"`
+	Agility      string `json:"agility"`
+	Accuracy     string `json:"accuracy"`
+	Charisma     string `json:"charisma"`
+	AlcoholLevel int    `json:"alcohol_level"`
+	Zgon         bool   `json:"zgon"`
+	Equipped     []int  `json:"equipped"`
+	Items        []int  `json:"items"`
+}
+
 type HPMana struct {
 	HP   int `json:"hp"`
 	Mana int `json:"mana"`
@@ -156,6 +178,46 @@ func (srv *Service) GetPlayerByID(id int) *Player {
 	return nil
 }
 
+func (srv *Service) GetPlayerResponseByID(id int) *PlayerResponse {
+	player := srv.GetPlayerByID(id)
+	playerTotal := *player
+	for _, id := range player.Items {
+		item, err := srv.GetItemByID(id)
+		if err != nil {
+			continue
+		}
+		playerTotal.Strength += item.Strength
+		playerTotal.Endurance += item.Endurance
+		playerTotal.Perception += item.Perception
+		playerTotal.Intelligence += item.Intelligence
+		playerTotal.Agility += item.Agility
+		playerTotal.Accuracy += item.Accuracy
+		playerTotal.Charisma += item.Charisma
+	}
+
+	return &PlayerResponse{
+		Id:           player.Id,
+		Name:         player.Name,
+		Health:       player.Health,
+		Mana:         player.Mana,
+		Level:        player.Level,
+		Class:        player.Class,
+		Race:         player.Race,
+		Subrace:      player.Subrace,
+		Strength:     fmt.Sprintf("%d (%d)", player.Strength, playerTotal.Strength),
+		Endurance:    fmt.Sprintf("%d (%d)", player.Endurance, playerTotal.Endurance),
+		Perception:   fmt.Sprintf("%d (%d)", player.Perception, playerTotal.Perception),
+		Intelligence: fmt.Sprintf("%d (%d)", player.Intelligence, playerTotal.Intelligence),
+		Agility:      fmt.Sprintf("%d (%d)", player.Agility, playerTotal.Agility),
+		Accuracy:     fmt.Sprintf("%d (%d)", player.Accuracy, playerTotal.Accuracy),
+		Charisma:     fmt.Sprintf("%d (%d)", player.Charisma, playerTotal.Charisma),
+		AlcoholLevel: player.AlcoholLevel,
+		Zgon:         player.Zgon,
+		Equipped:     player.Equipped,
+		Items:        player.Items,
+	}
+}
+
 func (srv *Service) ToggleZgon(playerID int) error {
 	if p := srv.GetPlayerByID(playerID); p == nil {
 		return errors.Wrap(ErrNoPlayer, "toggle zgon")
@@ -180,7 +242,7 @@ func (srv *Service) ChangeHPandMana(id int, hpmana HPMana) error {
 }
 
 func (srv *Service) CreatePlayer(p Player) (*Player, error) {
-	query := "INSERT INTO players (name, level, class, race, subrace, strength, endurance, perception, intelligence, agility, accuracy, charisma) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO players (name, level, class, race, subrace, strength, endurance, perception, intelligence, agility, accuracy, charisma, health, mana) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 100, 100)"
 	res, err := srv.db.Exec(query, p.Name, p.Level, p.Class, p.Race, p.Subrace, p.Strength, p.Endurance, p.Perception, p.Intelligence, p.Agility, p.Accuracy, p.Charisma)
 	id, _ := res.LastInsertId()
 	p.Id = int(id)

@@ -37,7 +37,7 @@ func GetPlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(internal.ErrIDNotNumber, "GetPlayerRoute")
 		}
 
-		p := srv.GetPlayerByID(id)
+		p := srv.GetPlayerResponseByID(id)
 		if p == nil {
 			return errors.Wrap(internal.ErrNoPlayer, "GetPlayerRoute")
 		}
