@@ -43,7 +43,7 @@
         attack: parseInt(formData.get("attack")!.toString()),
         defense: parseInt(formData.get("defense")!.toString()),
         permille: parseInt(formData.get("permille")!.toString()),
-        slot: slotMap.get(formData.get("slot")!.toString())
+        slot: slotMap.get(formData.get("slot")!.toString()),
       }
 
       fetch(HOST + "item", {

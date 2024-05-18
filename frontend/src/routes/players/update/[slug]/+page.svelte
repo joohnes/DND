@@ -160,7 +160,7 @@
           </div>
         </div>
         <div class="flex justify-center mt-4">
-          <button class="btn btn-outline btn-primary px-8"><input type="submit" value="Update"></button>
+          <input class="btn btn-outline btn-primary px-8" type="submit" value="Update" />
         </div>
       </fieldset>
       </form>

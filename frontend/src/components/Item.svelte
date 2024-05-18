@@ -201,16 +201,16 @@
 
 	{#if i != undefined}
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-		<div class="item collapse collapse-arrow" tabindex="0">
-			<input type="checkbox"/>
-			<div class="info collapse-title">
+		<div class="item collapse" tabindex="0">
+			<input id="open" type="checkbox"/>
+			<div class="flex justify-between collapse-title" style="padding-inline-end: 1rem!important;">
 				<div>
 					<div class="underline underline-offset-4">{i.name} x{i.quantity}</div>
 					{#if i.owner != ""}
-						<div>Owner: {i.owner}</div>
+						<div class="name" style="text-overflow: ellipsis;">{i.owner}</div>
 					{/if}
 				</div>
-				<div style="z-index: 40!important;">
+				<div style="z-index: 999!important;">
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -237,41 +237,59 @@
 					</div>
 				</div>
 				<div class="cellHolder flex-col">
+					{#if i.strength > 0}
 					<div class="statsCell">
 						<div>Strength:</div>
 						<div>{i.strength}</div>
 					</div>
+					{/if}
+					{#if i.endurance > 0}
 					<div class="statsCell">
 						<div>Endurance:</div>
 						<div>{i.endurance}</div>
 					</div>
+					{/if}
+					{#if i.perception > 0}
 					<div class="statsCell">
 						<div>Perception:</div>
 						<div>{i.perception}</div>
 					</div>
+					{/if}
+					{#if i.intelligence > 0}
 					<div class="statsCell">
 						<div>Intelligence:</div>
 						<div>{i.intelligence}</div>
 					</div>
+					{/if}
+					{#if i.agility > 0}
 					<div class="statsCell">
 						<div>Agility:</div>
 						<div>{i.agility}</div>
 					</div>
+					{/if}
+					{#if i.accuracy > 0}
 					<div class="statsCell">
 						<div>Accuracy:</div>
 						<div>{i.accuracy}</div>
 					</div>
+					{/if}
+					{#if i.charisma > 0}
 					<div class="statsCell">
 						<div>Charisma:</div>
 						<div>{i.charisma}</div>
 					</div>
+					{/if}
 				</div>
+				{#if i.description != undefined && i.description != ""}
 				<div class="cellHolder">
 					<div>{i.description}</div>
 				</div>
+				{/if}
+				{#if i.ability != undefined && i.ability != ""}
 				<div class="cellHolder">
 					<div>{i.ability}</div>
 				</div>
+				{/if}
 			</div>
 		</div>
 	{/if}
@@ -286,7 +304,7 @@
 	.item {
 		/* display: flex; */
 		flex-direction: column;
-		width: 18rem;
+		width: 20rem;
 		/* justify-content: space-between; */
 		/* padding: 1rem; */
 		border: 3px solid black;
@@ -306,11 +324,17 @@
 		flex-direction: row;
 		justify-content: space-between;
 	}
-	.info {
-		display: flex;
-		justify-content: space-between;
-	}
 	.info > div > span, .info > div > a {
 		cursor: pointer;
+	}
+	.name {
+		width: 9rem;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+	#open:checked + div > div > .name {
+		text-overflow: initial;
+		overflow-wrap: break-word;
+		overflow: visible;
 	}
 </style>

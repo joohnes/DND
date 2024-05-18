@@ -4,7 +4,7 @@
 	import PlayerEQ from './PlayerEQ.svelte';
   	import { HOST } from "$lib/host";
 
-	let p: Player;
+	let p: PlayerResponse;
 	let min = 1
 	onMount(async function () {
 		const res = await fetch(HOST + 'player/' + id);
@@ -26,7 +26,8 @@
 			accuracy: data.accuracy,
 			charisma: data.charisma,
 			alcohol_level: data.alcohol_level,
-			zgon: data.zgon
+			items: data.items,
+			zgon: data.zgon,
 		};
 		if (GetAlcoRange().length > 5) {
 			min = 0
@@ -37,9 +38,10 @@
 	let mana: number;
 	async function UpdateHPMANA() {
 		let data = {
-			hp: hp,
-			mana: mana,
+			hp: hp == undefined ? p.health : hp,
+			mana: mana == undefined ? p.mana : mana,
 		}
+		console.log(data)
 		fetch(HOST + "player/hpmana/" + p.id, {
         method: "PUT",
         body: JSON.stringify(data)
@@ -108,7 +110,6 @@
 		await fetch(HOST + "player/zgon/" + p.id, {
 			method: "POST"
 		})
-		showModal = false;
 		restart()
 	}
 
@@ -144,7 +145,11 @@
 </Modal>
 {:else if modalEq}
 <Modal bind:showModal fullScreen={true}>
-	<PlayerEQ id={p.id}/>
+	{#if p.items != undefined && p.items.length > 0}
+		<PlayerEQ id={p.id}/>
+	{:else}
+		<div class="text-lg">No Items in inventory</div>
+	{/if}
 </Modal>
 {/if}
 {#if p != undefined}
@@ -173,7 +178,7 @@
 			</div>
 		</div>
 		<div class="cellHolder">
-			<div class="underline underline-offset-1">{p.name}</div>
+			<div class="underline underline-offset-1 name">{p.name}</div>
 			<div class="badge badge-ghost badge-outline">LVL {p.level}</div>
 		</div>
 		<div class="cellHolder">
@@ -263,5 +268,9 @@
 	}
 	.info > div > span, .info > div > a {
 		cursor: pointer;
+	}
+	.name {
+		width: 9rem;
+		overflow-wrap: break-word;
 	}
 </style>

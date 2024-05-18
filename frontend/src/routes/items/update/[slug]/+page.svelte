@@ -43,7 +43,7 @@
         attack: parseInt(formData.get("attack")!.toString()),
         defense: parseInt(formData.get("defense")!.toString()),
         permille: parseInt(formData.get("permille")!.toString()),
-        slot: slotMap.get(formData.get("slot")!.toString())
+        slot: slotMap.get(formData.get("slot")!.toString()),
       }
 
       fetch(HOST + "item/" + id, {
@@ -73,7 +73,8 @@
         attack: data.attack,
         defense: data.defense,
         permille: data.permille,
-        slot: data.slot
+        slot: data.slot,
+        owner: data.owner,
       };
     });
   </script>
@@ -182,7 +183,7 @@
           </div>
           </div>
           <div class="flex justify-center mt-4">
-            <button class="btn btn-outline btn-primary px-8"><input type="submit" value="Update"></button>
+            <input class="btn btn-outline btn-primary px-8" type="submit" value="Update" />
           </div>
         </fieldset>
         </form>

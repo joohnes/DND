@@ -27,7 +27,7 @@ declare global {
 		defense: number;
 		permille: number;
 		slot?: number;
-		owner: string;
+		owner?: string;
 	}
 
 	interface Player {
@@ -46,6 +46,29 @@ declare global {
 		agility: number;
 		accuracy: number;
 		charisma: number;
+		session?: number;
+		items?: number[];
+		equipped?: number[];
+		alcohol_level?: number;
+		zgon?: boolean;
+	}
+
+	interface PlayerResponse {
+		id?: number;
+		name: string;
+		level: number;
+		health?: number;
+		mana?: number;
+		class: string;
+		race: string;
+		subrace: string;
+		strength: string;
+		endurance: string;
+		perception: string;
+		intelligence: string;
+		agility: string;
+		accuracy: string;
+		charisma: string;
 		session?: number;
 		items?: number[];
 		equipped?: number[];
