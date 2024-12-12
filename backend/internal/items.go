@@ -1,6 +1,10 @@
 package internal
 
-import "github.com/pkg/errors"
+import (
+	"database/sql"
+
+	"github.com/pkg/errors"
+)
 
 type Item struct {
 	Id           int    `json:"id"`
@@ -31,36 +35,75 @@ func IsValidRarity(rarity string) error {
 	return ErrInvalidRarity
 }
 
-func (srv *Service) getOwner(itemID int) string {
-	for _, p := range srv.players {
-		if p.IsInEquipment(itemID) {
-			return p.Name
-		}
+func (srv *Service) getOwner(itemID int) (string, error) {
+	query := "SELECT name FROM players where id = (SELECT player FROM player_items WHERE item = ?"
+	row := srv.db.QueryRow(query, itemID)
+	if err := row.Err(); err != nil {
+		return "", errors.Wrap(err, "query row")
 	}
-	return ""
-}
-
-func (srv *Service) GetItemByID(id int) (Item, error) {
-	for _, item := range srv.items {
-		if item.Id == id {
-			i := *item
-			i.Owner = srv.getOwner(i.Id)
-			return i, nil
-		}
+	var name string
+	if err := row.Scan(&name); err != nil {
+		return "", errors.Wrap(err, "scan")
 	}
 
-	return Item{}, ErrNoItem
+	return name, nil
 }
 
-func (srv *Service) GetItemsIDs() []int {
+func (srv *Service) GetItemByID(id int) (*Item, error) {
+	query := "SELECT * FROM items WHERE id=?"
+	row := srv.db.QueryRow(query, id)
+
+	if err := row.Err(); err != nil {
+		return nil, errors.Wrap(err, "queryrow")
+	}
+
+	var i *Item
+	if err := row.Scan(i); err != nil {
+		return nil, errors.Wrap(err, "scan")
+	}
+
+	return i, nil
+}
+
+func (srv *Service) GetPlayerItems(playerID int) ([]*Item, error) {
+	query := "SELECT * FROM items WHERE id in (SELECT item FROM player_items WHERE player=?)"
+	rows, err := srv.db.Query(query, playerID)
+	if err != nil {
+		return nil, errors.Wrap(err, "query")
+	}
+
+	items := make([]*Item, 0)
+	for rows.Next() {
+		var i *Item
+		if err := rows.Scan(i); err != nil {
+			return nil, errors.Wrap(err, "scan")
+		}
+
+		items = append(items, i)
+	}
+
+	return items, nil
+}
+
+func (srv *Service) GetItemsIDs() ([]int, error) {
+	query := "SELECT id FROM items WHERE id not in (SELECT item FROM bag_items)"
+	rows, err := srv.db.Query(query)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []int{}, nil
+		}
+		return nil, errors.Wrap(err, "query")
+	}
 	var ids []int
-	for _, i := range srv.items {
-		if srv.bag.IsItemInBag(i.Id) {
-			continue
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			return nil, errors.Wrap(err, "scan")
 		}
-		ids = append(ids, i.Id)
+
+		ids = append(ids, id)
 	}
-	return ids
+	return ids, nil
 }
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {
@@ -71,7 +114,6 @@ func (srv *Service) CreateItem(i Item) (*Item, error) {
 	}
 	id, _ := res.LastInsertId()
 	i.Id = int(id)
-	srv.items = append(srv.items, &i)
 	return &i, err
 }
 
@@ -98,47 +140,7 @@ func (srv *Service) UpdateItem(i Item) error {
 					id=?;
 	`
 	_, err := srv.db.Exec(query, i.Name, i.Description, i.Ability, i.Rarity, i.Strength, i.Endurance, i.Perception, i.Intelligence, i.Agility, i.Accuracy, i.Charisma, i.Quantity, i.Attack, i.Defense, i.Permille, i.Slot, i.Id)
-	if err != nil {
-		return errors.Wrap(err, "failed to update item")
-	}
-	return srv.ResetObjects(ItemType)
-}
-
-func (srv *Service) GetItemsFromDB() ([]*Item, error) {
-	query := "SELECT id, name, description, ability, rarity, strength, endurance, perception, intelligence, agility, accuracy, charisma, quantity, attack, defense, permille, slot FROM items"
-	rows, err := srv.db.Query(query)
-	defer func() { rows.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	var items []*Item
-	for rows.Next() {
-		i := &Item{}
-		rows.Scan(
-			&i.Id,
-			&i.Name,
-			&i.Description,
-			&i.Ability,
-			&i.Rarity,
-			&i.Strength,
-			&i.Endurance,
-			&i.Perception,
-			&i.Intelligence,
-			&i.Agility,
-			&i.Accuracy,
-			&i.Charisma,
-			&i.Quantity,
-			&i.Attack,
-			&i.Defense,
-			&i.Permille,
-			&i.Slot,
-		)
-
-		items = append(items, i)
-	}
-
-	return items, nil
+	return err
 }
 
 func (srv *Service) DeleteItem(id int) error {
@@ -148,8 +150,5 @@ func (srv *Service) DeleteItem(id int) error {
 	}
 
 	_, err = srv.db.Exec("DELETE FROM player_items WHERE item=?", id)
-	if err != nil {
-		return err
-	}
-	return srv.ResetObjects(ItemType, PlayerType)
+	return err
 }

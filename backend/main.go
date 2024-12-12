@@ -19,10 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	srv, err := internal.NewService(db)
-	if err != nil {
-		panic(err)
-	}
+	srv := internal.NewService(db)
 
 	app := fiber.New()
 	app.Use(logger.New(), cors.New())
@@ -47,7 +44,7 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Get("/players-names", routes.GetPlayerIdsWithNamesRoute(srv))
 	app.Delete("/player/:id", routes.DeletePlayerRoute(srv))
 	app.Post("/player/:playerID/add-item/:itemID", routes.AddItemRoute(srv))
-	app.Delete("/player/drop-item/:itemID", routes.DropItemRoute(srv))
+	app.Delete("/player/:playerID/drop-item/:itemID", routes.DropItemRoute(srv))
 	app.Put("/player/hpmana/:id", routes.ChangeHPandManaRoute(srv))
 	app.Get("/player/items/:playerID", routes.GetPlayerItemsRoute(srv))
 	app.Post("/alcohol", routes.AlcoholLevelDownRoute(srv))
@@ -64,7 +61,7 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Delete("/item/unequip/:itemID", routes.UnequipItemRoute(srv))
 
 	// bag
-	app.Post("/bag/add/:itemID", routes.AddItemToBagRoute(srv))
+	app.Post("/bag/player/:playerID/add/:itemID", routes.AddItemToBagRoute(srv))
 	app.Get("/bag", routes.GetBagRoute(srv))
 	app.Post("/bag/transfer/:itemID/:playerID", routes.TransferItemFromBagRoute(srv))
 	app.Delete("/bag/drop/:itemID", routes.DropItemFromBagRoute(srv))
