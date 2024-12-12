@@ -25,6 +25,13 @@
 			agility: data.agility,
 			accuracy: data.accuracy,
 			charisma: data.charisma,
+			strength_printable: data.strength_printable,
+			endurance_printable: data.endurance_printable,
+			perception_printable: data.perception_printable,
+			intelligence_printable: data.intelligence_printable,
+			agility_printable: data.agility_printable,
+			accuracy_printable: data.accuracy_printable,
+			charisma_printable: data.charisma_printable,
 			alcohol_level: data.alcohol_level,
 			items: data.items,
 			zgon: data.zgon,
@@ -41,7 +48,6 @@
 			hp: hp == undefined ? p.health : hp,
 			mana: mana == undefined ? p.mana : mana,
 		}
-		console.log(data)
 		fetch(HOST + "player/hpmana/" + p.id, {
         method: "PUT",
         body: JSON.stringify(data)
@@ -57,26 +63,23 @@
 		restart()
 	}
 
+
 	function GetAlcoRange() {
 		if (p.alcohol_level == undefined) {
 			return [1, 2, 3, 4, 5]
 		}
-		if (p.alcohol_level <= 5) {
-			return [0, 1, 2, 3, 4, 5]
-		} else if (p.alcohol_level <= 10) {
-			return [6, 7, 8, 9, 10]
-		} else if (p.alcohol_level <= 15) {
-			return [11, 12, 13, 14, 15]
-		} else if (p.alcohol_level <= 20) {
-			return [16, 17, 18, 19, 20]
-		} else if (p.alcohol_level <= 25) {
-			return [21, 22, 23, 24, 25]
-		} else if (p.alcohol_level <= 30) {
-			return [26, 27, 28, 29, 30]
-		} else {
-			return [1, 2, 3, 4, 5]
-		}
-	}
+    const minLevel = 5; // Minimum value for each step
+    const maxLevel = 200; // Maximum value for each step
+
+    if (p.alcohol_level < minLevel || p.alcohol_level > maxLevel) {
+      return [1, 2, 3, 4, 5]; // Default range if out of bounds
+    }
+
+    const step = Math.floor((p.alcohol_level - minLevel) / 5);
+    const start = minLevel + step * 5;
+
+    return Array.from({ length: 5 }, (_, i) => start + i);
+  }
 
 	function GetAlcoColor() {
 		if (p.alcohol_level == undefined || p.alcohol_level <= 1) {
@@ -101,7 +104,10 @@
 			if (lvl > 5) {
 				lvl -= 5
 			} else {
-				return lvl
+				if (lvl == 5) {
+					return lvl - 5
+				}
+				return lvl + 1
 			}
 		}
 	}
@@ -208,31 +214,31 @@
 		<div class="cellHolder flex-col">
 			<div class="statsCell">
 				<div>Strength:</div>
-				<div>{p.strength}</div>
+				<div>{p.strength_printable}</div>
 			</div>
 			<div class="statsCell">
 				<div>Endurance:</div>
-				<div>{p.endurance}</div>
+				<div>{p.endurance_printable}</div>
 			</div>
 			<div class="statsCell">
 				<div>Perception:</div>
-				<div>{p.perception}</div>
+				<div>{p.perception_printable}</div>
 			</div>
 			<div class="statsCell">
 				<div>Intelligence:</div>
-				<div>{p.intelligence}</div>
+				<div>{p.intelligence_printable}</div>
 			</div>
 			<div class="statsCell">
 				<div>Agility:</div>
-				<div>{p.agility}</div>
+				<div>{p.agility_printable}</div>
 			</div>
 			<div class="statsCell">
 				<div>Accuracy:</div>
-				<div>{p.accuracy}</div>
+				<div>{p.accuracy_printable}</div>
 			</div>
 			<div class="statsCell">
 				<div>Charisma:</div>
-				<div>{p.charisma}</div>
+				<div>{p.charisma_printable}</div>
 			</div>
 		</div>
 	</div>

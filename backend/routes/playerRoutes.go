@@ -21,7 +21,7 @@ func CreatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 
 		if player.Name == "" {
 			log.Println("error: empty name")
-			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
+			return errors.Wrap(internal.ErrEmptyName, "CreatePlayerRoute")
 		}
 
 		p, err := srv.CreatePlayer(player)
@@ -105,7 +105,7 @@ func UpdatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		}
 
 		if player.Name == "" {
-			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
+			return errors.Wrap(internal.ErrEmptyName, "CreatePlayerRoute")
 		}
 
 		err := srv.UpdatePlayer(player)

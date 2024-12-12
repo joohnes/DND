@@ -54,41 +54,20 @@
             <input id="level" name="level" type="number" class="input input-bordered w-full max-w-xs">
           </div>
 
-          <label for="class">Class</label>  
+          <label for="class">Class</label>
           <div>
-            <select name="class" class="select select-bordered w-full max-w-xs">
-              <option disabled selected>Choose class</option>
-              <option>Common</option>
-              <option>Rare</option>
-              <option>Epic</option>
-              <option>Legendary</option>
-              <option>Artefact</option>
-            </select>
+            <input id="class" name="class" type="text" class="input input-bordered w-full max-w-xs">
           </div>
         
           <label for="race">Race</label>  
           <div>
-            <select name="race" class="select select-bordered w-full max-w-xs">
-              <option disabled selected>Choose race</option>
-              <option>Common</option>
-              <option>Rare</option>
-              <option>Epic</option>
-              <option>Legendary</option>
-              <option>Artefact</option>
-            </select>
+            <input id="race" name="race" type="text" class="input input-bordered w-full max-w-xs">
           </div>
         
         
           <label for="subrace">Subrace</label>  
           <div>
-            <select name="subrace" class="select select-bordered w-full max-w-xs">
-              <option disabled selected>Choose subrace</option>
-              <option>Common</option>
-              <option>Rare</option>
-              <option>Epic</option>
-              <option>Legendary</option>
-              <option>Artefact</option>
-            </select>
+            <input id="subrace" name="subrace" type="text" class="input input-bordered w-full max-w-xs">
           </div>
 
         </div>

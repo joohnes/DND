@@ -1,7 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
-const isDev = true
+const isDev = false
 
 export default defineConfig({
 	plugins: [sveltekit()],

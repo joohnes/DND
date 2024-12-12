@@ -24,6 +24,7 @@
         charisma: parseInt(formData.get("charisma")!.toString()),
         alcohol_level: parseInt(formData.get("alcohol_level")!.toString())
       }
+      console.log(formData)
 
       fetch(HOST + "player/" + id, {
         method: "PUT",
@@ -35,6 +36,7 @@
     onMount(async function () {
       const res = await fetch(HOST + 'player/' + id);
       const data = await res.json();
+      console.log(data)
       p = {
         id: data.id,
         name: data.name,
@@ -73,41 +75,20 @@
               <input id="level" name="level" type="number" value={p.level} class="input input-bordered w-full max-w-xs">
             </div>
           
-            <label for="class">Class</label>  
+            <label for="class">Class</label>
             <div>
-              <select name="class" value={p.class} class="select select-bordered w-full max-w-xs">
-                <option disabled selected>Choose class</option>
-                <option>Common</option>
-                <option>Rare</option>
-                <option>Epic</option>
-                <option>Legendary</option>
-                <option>Artefact</option>
-              </select>
+              <input id="class" name="class" type="text" value={p.class} class="input input-bordered w-full max-w-xs">
             </div>
           
             <label for="race">Race</label>  
             <div>
-              <select name="race" value={p.race} class="select select-bordered w-full max-w-xs">
-                <option disabled selected>Choose race</option>
-                <option>Common</option>
-                <option>Rare</option>
-                <option>Epic</option>
-                <option>Legendary</option>
-                <option>Artefact</option>
-              </select>
+              <input id="race" name="race" type="text" value={p.race} class="input input-bordered w-full max-w-xs">
             </div>
           
           
             <label for="subrace">Subrace</label>  
             <div>
-              <select name="subrace" value={p.subrace} class="select select-bordered w-full max-w-xs">
-                <option disabled selected>Choose subrace</option>
-                <option>Common</option>
-                <option>Rare</option>
-                <option>Epic</option>
-                <option>Legendary</option>
-                <option>Artefact</option>
-              </select>
+              <input id="subrace" name="subrace" type="text" value={p.subrace} class="input input-bordered w-full max-w-xs">
             </div>
 
             <label for="alcohol_level">Alcohol Level</label>  
