@@ -8,47 +8,57 @@ import (
 )
 
 type Player struct {
-	Id           int    `json:"id"`
-	Name         string `json:"name"`
-	Level        int    `json:"level"`
-	Health       int    `json:"health"`
-	Mana         int    `json:"mana"`
-	Class        string `json:"class"`
-	Race         string `json:"race"`
-	Subrace      string `json:"subrace"`
-	Strength     int    `json:"strength"`
-	Endurance    int    `json:"endurance"`
-	Perception   int    `json:"perception"`
-	Intelligence int    `json:"intelligence"`
-	Agility      int    `json:"agility"`
-	Accuracy     int    `json:"accuracy"`
-	Charisma     int    `json:"charisma"`
-	AlcoholLevel int    `json:"alcohol_level"`
-	Zgon         bool   `json:"zgon"`
-	Equipped     []int  `json:"equipped"`
-	Items        []int  `json:"items"`
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	Level   int    `json:"level"`
+	Health  int    `json:"health"`
+	Mana    int    `json:"mana"`
+	Class   string `json:"class"`
+	Race    string `json:"race"`
+	Subrace string `json:"subrace"`
+	Stats
+	AlcoholLevel int   `json:"alcohol_level"`
+	Zgon         bool  `json:"zgon"`
+	Equipped     []int `json:"equipped"`
+	Items        []int `json:"items"`
 }
 
 type PlayerResponse struct {
-	Id           int    `json:"id"`
-	Name         string `json:"name"`
-	Level        int    `json:"level"`
-	Health       int    `json:"health"`
-	Mana         int    `json:"mana"`
-	Class        string `json:"class"`
-	Race         string `json:"race"`
-	Subrace      string `json:"subrace"`
-	Strength     string `json:"strength"`
-	Endurance    string `json:"endurance"`
-	Perception   string `json:"perception"`
-	Intelligence string `json:"intelligence"`
-	Agility      string `json:"agility"`
-	Accuracy     string `json:"accuracy"`
-	Charisma     string `json:"charisma"`
-	AlcoholLevel int    `json:"alcohol_level"`
-	Zgon         bool   `json:"zgon"`
-	Equipped     []int  `json:"equipped"`
-	Items        []int  `json:"items"`
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	Level   int    `json:"level"`
+	Health  int    `json:"health"`
+	Mana    int    `json:"mana"`
+	Class   string `json:"class"`
+	Race    string `json:"race"`
+	Subrace string `json:"subrace"`
+	Stats
+	StatsPrintable
+	AlcoholLevel int   `json:"alcohol_level"`
+	Zgon         bool  `json:"zgon"`
+	Equipped     []int `json:"equipped"`
+	Items        []int `json:"items"`
+}
+
+type Stats struct {
+	Subrace      int `json:"subrace"`
+	Strength     int `json:"strength"`
+	Endurance    int `json:"endurance"`
+	Perception   int `json:"perception"`
+	Intelligence int `json:"intelligence"`
+	Agility      int `json:"agility"`
+	Accuracy     int `json:"accuracy"`
+	Charisma     int `json:"charisma"`
+}
+
+type StatsPrintable struct {
+	StrengthPrintable     string `json:"strength_printable"`
+	EndurancePrintable    string `json:"endurance_printable"`
+	PerceptionPrintable   string `json:"perception_printable"`
+	IntelligencePrintable string `json:"intelligence_printable"`
+	AgilityPrintable      string `json:"agility_printable"`
+	AccuracyPrintable     string `json:"accuracy_printable"`
+	CharismaPrintable     string `json:"charisma_printable"`
 }
 
 type HPMana struct {
@@ -196,21 +206,32 @@ func (srv *Service) GetPlayerResponseByID(id int) *PlayerResponse {
 	}
 
 	return &PlayerResponse{
-		Id:           player.Id,
-		Name:         player.Name,
-		Health:       player.Health,
-		Mana:         player.Mana,
-		Level:        player.Level,
-		Class:        player.Class,
-		Race:         player.Race,
-		Subrace:      player.Subrace,
-		Strength:     fmt.Sprintf("%d (%d)", player.Strength, playerTotal.Strength),
-		Endurance:    fmt.Sprintf("%d (%d)", player.Endurance, playerTotal.Endurance),
-		Perception:   fmt.Sprintf("%d (%d)", player.Perception, playerTotal.Perception),
-		Intelligence: fmt.Sprintf("%d (%d)", player.Intelligence, playerTotal.Intelligence),
-		Agility:      fmt.Sprintf("%d (%d)", player.Agility, playerTotal.Agility),
-		Accuracy:     fmt.Sprintf("%d (%d)", player.Accuracy, playerTotal.Accuracy),
-		Charisma:     fmt.Sprintf("%d (%d)", player.Charisma, playerTotal.Charisma),
+		Id:      player.Id,
+		Name:    player.Name,
+		Health:  player.Health,
+		Mana:    player.Mana,
+		Level:   player.Level,
+		Class:   player.Class,
+		Race:    player.Race,
+		Subrace: player.Subrace,
+		Stats: Stats{
+			Strength:     player.Strength,
+			Endurance:    player.Endurance,
+			Perception:   player.Perception,
+			Intelligence: player.Intelligence,
+			Agility:      player.Agility,
+			Accuracy:     player.Accuracy,
+			Charisma:     player.Charisma,
+		},
+		StatsPrintable: StatsPrintable{
+			StrengthPrintable:     fmt.Sprintf("%d (%d)", player.Strength, playerTotal.Strength),
+			EndurancePrintable:    fmt.Sprintf("%d (%d)", player.Endurance, playerTotal.Endurance),
+			PerceptionPrintable:   fmt.Sprintf("%d (%d)", player.Perception, playerTotal.Perception),
+			IntelligencePrintable: fmt.Sprintf("%d (%d)", player.Intelligence, playerTotal.Intelligence),
+			AgilityPrintable:      fmt.Sprintf("%d (%d)", player.Agility, playerTotal.Agility),
+			AccuracyPrintable:     fmt.Sprintf("%d (%d)", player.Accuracy, playerTotal.Accuracy),
+			CharismaPrintable:     fmt.Sprintf("%d (%d)", player.Charisma, playerTotal.Charisma),
+		},
 		AlcoholLevel: player.AlcoholLevel,
 		Zgon:         player.Zgon,
 		Equipped:     player.Equipped,

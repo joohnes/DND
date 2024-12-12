@@ -26,9 +26,8 @@ func ConnectDB() (*sql.DB, error) {
 			panic(err)
 		}
 
-		pingErr := db.Ping()
-		if pingErr != nil {
-			panic(pingErr)
+		if err := db.Ping(); err != nil {
+			panic(err)
 		}
 	} else {
 		db, err = sql.Open("sqlite3", database)

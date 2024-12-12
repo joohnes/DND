@@ -3,6 +3,7 @@ package routes
 import (
 	"dndEq/internal"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -14,15 +15,18 @@ func CreatePlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		var player internal.Player
 		if err := json.Unmarshal(ctx.Body(), &player); err != nil {
+			log.Println("error: unmarshal", err)
 			return errors.Wrap(err, "CreatePlayerRoute")
 		}
 
 		if player.Name == "" {
+			log.Println("error: empty name")
 			return errors.Wrap(internal.ErrEmptyName, "CreateItemRoute")
 		}
 
 		p, err := srv.CreatePlayer(player)
 		if err != nil {
+			log.Println("error: createplayer", err)
 			return errors.Wrap(err, "CreatePlayerRoute")
 		}
 
