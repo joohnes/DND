@@ -41,9 +41,9 @@ func GetPlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(internal.ErrIDNotNumber, "GetPlayerRoute")
 		}
 
-		p := srv.GetPlayerResponseByID(id)
-		if p == nil {
-			return errors.Wrap(internal.ErrNoPlayer, "GetPlayerRoute")
+		p, err := srv.GetPlayerResponseByID(id)
+		if err != nil {
+			return errors.Wrap(err, "GetPlayerRoute")
 		}
 
 		return ctx.JSON(p)
@@ -52,13 +52,25 @@ func GetPlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 
 func GetPlayersIDsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		return ctx.JSON(srv.GetPlayersIDs())
+		ids, err := srv.GetPlayersIDs()
+		if err != nil {
+			log.Println(errors.Wrap(err, "GetPlayersIDsRoute"))
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.ErrInternalServerError)
+		}
+
+		return ctx.JSON(ids)
 	}
 }
 
 func GetPlayerIdsWithNamesRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		return ctx.JSON(srv.GetPlayerIdsWithNames())
+		idnames, err := srv.GetPlayerIdsWithNames()
+		if err != nil {
+			log.Println(errors.Wrap(err, "GetPlayersIDsWithNamesRoute"))
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.ErrInternalServerError)
+		}
+
+		return ctx.JSON(idnames)
 	}
 }
 
@@ -90,7 +102,7 @@ func DropItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
-			return errors.Wrap(err, "DropItemRoute player id")
+			return errors.Wrap(err, "DropItemRoute item id")
 		}
 
 		return srv.DropItem(itemID)
@@ -162,7 +174,12 @@ func GetPlayerItemsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return errors.Wrap(internal.ErrIDNotNumber, "GetPlayerItemsRoute")
 		}
 
-		return ctx.JSON(srv.GetPlayerByID(playerID).GetItems())
+		items, err := srv.GetPlayerItems(playerID)
+		if err != nil {
+			return errors.Wrap(err, "GetPlayerItemsRoute")
+		}
+
+		return ctx.JSON(items)
 	}
 }
 

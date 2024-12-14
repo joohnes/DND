@@ -41,12 +41,10 @@
 		}
 	});
 
-	let hp: number;
-	let mana: number;
 	async function UpdateHPMANA() {
 		let data = {
-			hp: hp == undefined ? p.health : hp,
-			mana: mana == undefined ? p.mana : mana,
+			hp: p.health,
+			mana: p.mana
 		}
 		fetch(HOST + "player/hpmana/" + p.id, {
         method: "PUT",
@@ -132,11 +130,11 @@
 	<div class="flex flex-col py-2 gap-4">
 		<div class="flex gap-4 justify-between">
 			<label for="hp" class="my-auto">HP</label>
-			<input type="number" id="hp" name="hp" class="input input-sm input-bordered w-20" bind:value={hp}>
+			<input type="number" id="hp" name="hp" class="input input-sm input-bordered w-20" bind:value={p.health}>
 		</div>
 		<div class="flex gap-4 justify-between">
 			<label for="mana" class="my-auto">MANA</label>
-			<input type="number" id="mana" name="mana" class="input input-sm input-bordered w-20" bind:value={mana}>
+			<input type="number" id="mana" name="mana" class="input input-sm input-bordered w-20" bind:value={p.mana}>
 		</div>
 	</div>
 	<button class="btn btn-outline btn-success px-12 mb-2" on:click={()=> {UpdateHPMANA()}}>Update</button>

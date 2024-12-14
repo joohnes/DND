@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"log/slog"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -14,7 +15,17 @@ type Bag struct {
 	Items  []int `json:"items"`
 }
 
-func (srv *Service) GetBagFromDB() (*Bag, error) {
+func (srv *Service) GetBagID() (int, error) {
+	var id int
+	query := `SELECT id FROM items where isbag = true`
+	err := srv.db.QueryRow(query).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func (srv *Service) GetBag() (*Bag, error) {
 	var items []int
 	bag := &Bag{}
 	var tmp string
@@ -51,20 +62,6 @@ func (srv *Service) GetBagFromDB() (*Bag, error) {
 	return bag, nil
 }
 
-func (srv *Service) GetBagID() (int, error) {
-	var id int
-	query := `SELECT id FROM items where isbag = true`
-	err := srv.db.QueryRow(query).Scan(&id)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-
-func (srv *Service) GetBag() *Bag {
-	return srv.bag
-}
-
 func (bag *Bag) IsItemInBag(id int) bool {
 	for _, item := range bag.Items {
 		if item == id {
@@ -74,47 +71,33 @@ func (bag *Bag) IsItemInBag(id int) bool {
 	return false
 }
 
-func (srv *Service) GetBagHolderName() string {
-	for _, p := range srv.players {
-		if p.Id == srv.bag.Holder {
-			return p.Name
-		}
+func (srv *Service) GetBagHolderName() (string, error) {
+	slog.Error("start")
+	query := "SELECT name FROM players where id=(SELECT value from settings WHERE name='bag_holder')"
+	row := srv.db.QueryRow(query)
+	if err := row.Err(); err != nil {
+		return "", err
 	}
-	return ""
+	name := ""
+	err := row.Scan(&name)
+	slog.Error(name)
+	return name, err
 }
 
 func (srv *Service) ChangeBagHolder(playerID int) error {
 	query := "UPDATE settings SET value=? WHERE name='bag_holder'"
 	_, err := srv.db.Exec(query, playerID)
-	if err != nil {
-		return err
-	}
-	srv.bag.Holder = playerID
-	return srv.ResetObjects(BagType)
+	return err
 }
 
 func (srv *Service) DropItemFromBag(itemID int) error {
-	if !srv.bag.IsItemInBag(itemID) {
-		return ErrItemNotFound
-	}
 	query := "DELETE FROM bag_items WHERE item=?"
 	_, err := srv.db.Exec(query, itemID)
-	if err != nil {
-		return err
-	}
-
-	return srv.ResetObjects(BagType)
+	return err
 }
 
 func (srv *Service) AddItemToBag(itemID int) error {
-	if srv.bag.IsItemInBag(itemID) {
-		return errors.Wrap(ErrItemAlreadyExists, "bag")
-	}
 	query := "INSERT INTO bag_items (item) VALUES (?)"
 	_, err := srv.db.Exec(query, itemID)
-	if err != nil {
-		return err
-	}
-
-	return srv.ResetObjects(BagType)
+	return err
 }

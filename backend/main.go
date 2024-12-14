@@ -19,14 +19,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	srv, err := internal.NewService(db)
-	if err != nil {
-		panic(err)
-	}
+	srv := internal.NewService(db)
 
 	app := fiber.New()
 	app.Use(logger.New(), cors.New())
-	// srv.TestObjects()
 	register(app, srv)
 
 	var port string

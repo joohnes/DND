@@ -3,6 +3,7 @@ package routes
 import (
 	"dndEq/internal"
 	"encoding/json"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -36,7 +37,12 @@ func CreateItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 
 func GetItemsIDsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		return ctx.JSON(srv.GetItemsIDs())
+		ids, err := srv.GetItemsIDs()
+		if err != nil {
+			log.Println(errors.Wrap(err, "GetItemsIDs"))
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.ErrInternalServerError)
+		}
+		return ctx.JSON(ids)
 	}
 }
 
