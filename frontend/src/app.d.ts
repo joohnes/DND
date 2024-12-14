@@ -81,6 +81,7 @@ declare global {
 		equipped?: number[];
 		alcohol_level?: number;
 		zgon?: boolean;
+		is_holder?: boolean;
 	}
 
 	interface Bag {

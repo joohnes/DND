@@ -4,38 +4,9 @@
 	import PlayerEQ from './PlayerEQ.svelte';
   	import { HOST } from "$lib/host";
 
-	let p: PlayerResponse;
+	export let p: PlayerResponse;
 	let min = 1
 	onMount(async function () {
-		const res = await fetch(HOST + 'player/' + id);
-		const data = await res.json();
-		p = {
-			id: data.id,
-			name: data.name,
-			level: data.level,
-			health: data.health,
-			mana: data.mana,
-			class: data.class,
-			race: data.race,
-			subrace: data.subrace,
-			strength: data.strength,
-			endurance: data.endurance,
-			perception: data.perception,
-			intelligence: data.intelligence,
-			agility: data.agility,
-			accuracy: data.accuracy,
-			charisma: data.charisma,
-			strength_printable: data.strength_printable,
-			endurance_printable: data.endurance_printable,
-			perception_printable: data.perception_printable,
-			intelligence_printable: data.intelligence_printable,
-			agility_printable: data.agility_printable,
-			accuracy_printable: data.accuracy_printable,
-			charisma_printable: data.charisma_printable,
-			alcohol_level: data.alcohol_level,
-			items: data.items,
-			zgon: data.zgon,
-		};
 		if (GetAlcoRange().length > 5) {
 			min = 0
 		}
@@ -120,7 +91,6 @@
 	let showModal: boolean;
 	let modalUpdate: boolean;
 	let modalEq: boolean;
-	export let id: number = 0;
 	export let restart: Function;
 </script>
 {#if modalUpdate}
@@ -167,14 +137,16 @@
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<span on:click={()=>{modalUpdate=true;modalEq=false;showModal = true}}>
 					<span class="text-red-500">HP<span class="text-blue-600">MANA</span></span>
-					
 				</span>
+				{#if p.is_holder}
+					🎒
+				{/if}
 			</div>
 			<div>
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<span on:click={Zgon}>💀</span>
-				<a href={window.location.origin+"/players/update/"+id}>⚙️</a>
+				<a href={window.location.origin+"/players/update/"+p.id}>⚙️</a>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-missing-attribute -->

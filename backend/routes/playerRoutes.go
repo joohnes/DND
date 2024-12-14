@@ -4,6 +4,7 @@ import (
 	"dndEq/internal"
 	"encoding/json"
 	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -50,7 +51,7 @@ func GetPlayerRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	}
 }
 
-func GetPlayersIDsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+func GetPlayersRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
 		ids, err := srv.GetPlayersIDs()
 		if err != nil {
@@ -58,7 +59,16 @@ func GetPlayersIDsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.ErrInternalServerError)
 		}
 
-		return ctx.JSON(ids)
+		players := make([]*internal.PlayerResponse, 0)
+		for _, p := range ids {
+			pr, err := srv.GetPlayerResponseByID(p)
+			if err != nil {
+				slog.Error("GetPlayersRoute", slog.Any("err", err))
+			}
+			players = append(players, pr)
+		}
+
+		return ctx.JSON(players)
 	}
 }
 

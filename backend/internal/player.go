@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/pkg/errors"
 )
@@ -216,6 +217,14 @@ func (srv *Service) GetPlayerResponseByID(id int) (*PlayerResponse, error) {
 		playerTotal.Charisma += item.Charisma
 	}
 
+	isHolder := false
+	holder, err := srv.GetBagHolderName()
+	if err != nil {
+		slog.Error("GetPlayerResponseByID", slog.Any("err", err))
+	} else {
+		isHolder = holder == player.Name
+	}
+
 	return &PlayerResponse{
 		Id:      player.Id,
 		Name:    player.Name,
@@ -247,6 +256,7 @@ func (srv *Service) GetPlayerResponseByID(id int) (*PlayerResponse, error) {
 		Zgon:         player.Zgon,
 		Equipped:     player.Equipped,
 		Items:        player.Items,
+		IsHolder:     isHolder,
 	}, nil
 }
 

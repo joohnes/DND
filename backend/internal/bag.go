@@ -2,7 +2,6 @@ package internal
 
 import (
 	"database/sql"
-	"log/slog"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -72,7 +71,6 @@ func (bag *Bag) IsItemInBag(id int) bool {
 }
 
 func (srv *Service) GetBagHolderName() (string, error) {
-	slog.Error("start")
 	query := "SELECT name FROM players where id=(SELECT value from settings WHERE name='bag_holder')"
 	row := srv.db.QueryRow(query)
 	if err := row.Err(); err != nil {
@@ -80,7 +78,6 @@ func (srv *Service) GetBagHolderName() (string, error) {
 	}
 	name := ""
 	err := row.Scan(&name)
-	slog.Error(name)
 	return name, err
 }
 

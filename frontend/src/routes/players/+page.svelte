@@ -45,7 +45,7 @@
 	</div>
 	<div class="flex flex-wrap gap-5 justify-center">
 		{#each $players as player}
-			<Player id={player} restart={restart}/>
+			<Player p={player} restart={restart}/>
 		{/each}
 	</div>
 	{:else}
