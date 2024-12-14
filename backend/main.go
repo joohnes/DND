@@ -39,7 +39,7 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Post("/player", routes.CreatePlayerRoute(srv))
 	app.Put("/player/:id", routes.UpdatePlayerRoute(srv))
 	app.Get("/player/:id", routes.GetPlayerRoute(srv))
-	app.Get("/players", routes.GetPlayersIDsRoute(srv))
+	app.Get("/players", routes.GetPlayersRoute(srv))
 	app.Get("/players-names", routes.GetPlayerIdsWithNamesRoute(srv))
 	app.Delete("/player/:id", routes.DeletePlayerRoute(srv))
 	app.Post("/player/:playerID/add-item/:itemID", routes.AddItemRoute(srv))
