@@ -100,16 +100,12 @@ func AddItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 
 func DropItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		playerID, err := strconv.Atoi(ctx.Params("playerID"))
-		if err != nil {
-			return errors.Wrap(err, "DropItemRoute player id")
-		}
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
 			return errors.Wrap(err, "DropItemRoute item id")
 		}
 
-		return srv.DropItem(playerID, itemID)
+		return srv.DropItem(itemID)
 	}
 }
 

@@ -37,6 +37,7 @@ type PlayerResponse struct {
 	Zgon         bool  `json:"zgon"`
 	Equipped     []int `json:"equipped"`
 	Items        []int `json:"items"`
+	IsHolder     bool  `json:"is_holder"`
 }
 
 type Stats struct {
@@ -105,9 +106,9 @@ func (srv *Service) UnequipItem(itemID int) error {
 	return err
 }
 
-func (srv *Service) DropItem(playerID, itemID int) error {
-	query := "DELETE FROM player_items WHERE player=? AND item=?"
-	_, err := srv.db.Exec(query, playerID, itemID)
+func (srv *Service) DropItem(itemID int) error {
+	query := "DELETE FROM player_items WHERE item=?"
+	_, err := srv.db.Exec(query, itemID)
 	return errors.Wrap(err, "failed to drop item")
 }
 
@@ -166,8 +167,28 @@ func (srv *Service) GetPlayerByID(id int) (*Player, error) {
 	if row.Err() != nil {
 		return nil, errors.Wrap(row.Err(), "GetPlayerByID")
 	}
-	var p *Player
-	if err := row.Scan(p); err != nil {
+
+	p := &Player{}
+	err := row.Scan(
+		&p.Id,
+		&p.Name,
+		&p.Level,
+		&p.Health,
+		&p.Mana,
+		&p.Strength,
+		&p.Endurance,
+		&p.Perception,
+		&p.Intelligence,
+		&p.Agility,
+		&p.Accuracy,
+		&p.Charisma,
+		&p.Class,
+		&p.Race,
+		&p.Subrace,
+		&p.AlcoholLevel,
+		&p.Zgon,
+	)
+	if err != nil {
 		return nil, errors.Wrap(err, "scan")
 	}
 

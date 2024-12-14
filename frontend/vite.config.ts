@@ -4,6 +4,9 @@ import { defineConfig } from 'vite';
 const isDev = false
 
 export default defineConfig({
+	build: {
+		outDir: 'build',
+	},
 	plugins: [sveltekit()],
 	server: {
 		proxy: {

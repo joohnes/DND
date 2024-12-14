@@ -4,6 +4,7 @@ import (
 	"dndEq/internal"
 	"encoding/json"
 	"log"
+	"log/slog"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -12,17 +13,12 @@ import (
 
 func AddItemToBagRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		playerID, err := strconv.Atoi(ctx.Params("playerID"))
-		if err != nil {
-			return errors.Wrap(err, "AddItemToBagRoute player id")
-		}
-
 		itemID, err := strconv.Atoi(ctx.Params("itemID"))
 		if err != nil {
 			return errors.Wrap(err, "AddItemToBagRoute item id")
 		}
 
-		err = srv.DropItem(playerID, itemID)
+		err = srv.DropItem(itemID)
 		if err != nil {
 			return errors.Wrap(err, "AddItemToBagRoute")
 		}
@@ -95,18 +91,12 @@ func DropItemFromBagRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 
 func GetBagHolderRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		bag, err := srv.GetBag()
+		name, err := srv.GetBagHolderName()
 		if err != nil {
-			return errors.Wrap(err, "GetBagHolderRoute: GetBag")
-		}
-
-		name, err := srv.GetBagHolderName(bag.Holder)
-		if err != nil {
-			return errors.Wrap(err, "GetBagHolderRoute: GetBagHolderName")
+			slog.Error(err.Error())
 		}
 		return ctx.JSON(name)
 	}
-
 }
 
 func ChangeBagHolderRoute(srv *internal.Service) func(ctx fiber.Ctx) error {

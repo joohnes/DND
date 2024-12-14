@@ -57,8 +57,27 @@ func (srv *Service) GetItemByID(id int) (*Item, error) {
 		return nil, errors.Wrap(err, "queryrow")
 	}
 
-	var i *Item
-	if err := row.Scan(i); err != nil {
+	i := &Item{}
+	err := row.Scan(
+		&i.Id,
+		&i.Name,
+		&i.Description,
+		&i.Ability,
+		&i.Rarity,
+		&i.Strength,
+		&i.Endurance,
+		&i.Perception,
+		&i.Intelligence,
+		&i.Agility,
+		&i.Accuracy,
+		&i.Charisma,
+		&i.Quantity,
+		&i.Attack,
+		&i.Defense,
+		&i.Permille,
+		&i.Slot,
+	)
+	if err != nil {
 		return nil, errors.Wrap(err, "scan")
 	}
 
@@ -74,8 +93,27 @@ func (srv *Service) GetPlayerItems(playerID int) ([]*Item, error) {
 
 	items := make([]*Item, 0)
 	for rows.Next() {
-		var i *Item
-		if err := rows.Scan(i); err != nil {
+		i := &Item{}
+		err := rows.Scan(
+			&i.Id,
+			&i.Name,
+			&i.Description,
+			&i.Ability,
+			&i.Rarity,
+			&i.Strength,
+			&i.Endurance,
+			&i.Perception,
+			&i.Intelligence,
+			&i.Agility,
+			&i.Accuracy,
+			&i.Charisma,
+			&i.Quantity,
+			&i.Attack,
+			&i.Defense,
+			&i.Permille,
+			&i.Slot,
+		)
+		if err != nil {
 			return nil, errors.Wrap(err, "scan")
 		}
 
