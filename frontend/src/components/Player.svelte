@@ -139,7 +139,7 @@
 					<span class="text-red-500">HP<span class="text-blue-600">MANA</span></span>
 				</span>
 				{#if p.is_holder}
-					🎒
+					<a href={window.location.origin+"/bag"}>🎒</a>
 				{/if}
 			</div>
 			<div>

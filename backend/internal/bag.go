@@ -2,46 +2,28 @@ package internal
 
 import (
 	"database/sql"
-	"strconv"
 
 	"github.com/pkg/errors"
 )
 
 // bag of holding
 type Bag struct {
-	Id     int   `json:"-"`
-	Holder int   `json:"-"`
-	Items  []int `json:"items"`
-}
-
-func (srv *Service) GetBagID() (int, error) {
-	var id int
-	query := `SELECT id FROM items where isbag = true`
-	err := srv.db.QueryRow(query).Scan(&id)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+	Id     int    `json:"-"`
+	Holder string `json:"holder"`
+	Items  []Item `json:"items"`
 }
 
 func (srv *Service) GetBag() (*Bag, error) {
-	var items []int
+	var items []Item
 	bag := &Bag{}
-	var tmp string
-	var holder int
 
-	query := "SELECT value FROM settings WHERE name='bag_holder'"
-	err := srv.db.QueryRow(query).Scan(&tmp)
+	query := "SELECT name FROM players where id=(SELECT value from settings WHERE name='bag_holder')"
+	err := srv.db.QueryRow(query).Scan(&bag.Holder)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
 
-	holder, err = strconv.Atoi(tmp)
-	if err != nil {
-		return nil, err
-	}
-
-	query = "SELECT item FROM bag_items"
+	query = "SELECT * FROM items WHERE id in (SELECT item FROM bag_items)"
 	rows, err := srv.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -49,25 +31,33 @@ func (srv *Service) GetBag() (*Bag, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var itemID int
-		if err := rows.Scan(&itemID); err != nil {
+		var i Item
+		if err := rows.Scan(
+			&i.Id,
+			&i.Name,
+			&i.Description,
+			&i.Ability,
+			&i.Rarity,
+			&i.Strength,
+			&i.Endurance,
+			&i.Perception,
+			&i.Intelligence,
+			&i.Agility,
+			&i.Accuracy,
+			&i.Charisma,
+			&i.Quantity,
+			&i.Attack,
+			&i.Defense,
+			&i.Permille,
+			&i.Slot,
+		); err != nil {
 			return nil, err
 		}
-		items = append(items, itemID)
+		items = append(items, i)
 	}
-	bag.Holder = holder
 	bag.Items = items
 
 	return bag, nil
-}
-
-func (bag *Bag) IsItemInBag(id int) bool {
-	for _, item := range bag.Items {
-		if item == id {
-			return true
-		}
-	}
-	return false
 }
 
 func (srv *Service) GetBagHolderName() (string, error) {

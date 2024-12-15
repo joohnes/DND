@@ -51,7 +51,7 @@ func register(app *fiber.App, srv *internal.Service) {
 
 	// item
 	app.Post("/item", routes.CreateItemRoute(srv))
-	app.Get("/items", routes.GetItemsIDsRoute(srv))
+	app.Get("/items", routes.GetItemsRoute(srv))
 	app.Get("/item/:id", routes.GetItemRoute(srv))
 	app.Put("/item/:id", routes.UpdateItemRoute(srv))
 	app.Delete("/item/:id", routes.DeleteItemRoute(srv))
@@ -64,6 +64,5 @@ func register(app *fiber.App, srv *internal.Service) {
 	app.Get("/bag", routes.GetBagRoute(srv))
 	app.Post("/bag/transfer/:itemID/:playerID", routes.TransferItemFromBagRoute(srv))
 	app.Delete("/bag/drop/:itemID", routes.DropItemFromBagRoute(srv))
-	app.Get("/bag/holder", routes.GetBagHolderRoute(srv))
 	app.Post("/bag/holder", routes.ChangeBagHolderRoute(srv))
 }

@@ -35,9 +35,9 @@ func CreateItemRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	}
 }
 
-func GetItemsIDsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
+func GetItemsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 	return func(ctx fiber.Ctx) error {
-		ids, err := srv.GetItemsIDs()
+		ids, err := srv.GetItems()
 		if err != nil {
 			log.Println(errors.Wrap(err, "GetItemsIDs"))
 			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.ErrInternalServerError)

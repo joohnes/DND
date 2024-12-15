@@ -123,25 +123,44 @@ func (srv *Service) GetPlayerItems(playerID int) ([]*Item, error) {
 	return items, nil
 }
 
-func (srv *Service) GetItemsIDs() ([]int, error) {
-	query := "SELECT id FROM items WHERE id not in (SELECT item FROM bag_items)"
+func (srv *Service) GetItems() ([]*Item, error) {
+	query := "SELECT * FROM items WHERE id not in (SELECT item FROM bag_items)"
 	rows, err := srv.db.Query(query)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return []int{}, nil
+			return nil, nil
 		}
 		return nil, errors.Wrap(err, "query")
 	}
-	var ids []int
+	var items []*Item
 	for rows.Next() {
-		var id int
-		if err := rows.Scan(&id); err != nil {
+		i := &Item{}
+		err := rows.Scan(
+			&i.Id,
+			&i.Name,
+			&i.Description,
+			&i.Ability,
+			&i.Rarity,
+			&i.Strength,
+			&i.Endurance,
+			&i.Perception,
+			&i.Intelligence,
+			&i.Agility,
+			&i.Accuracy,
+			&i.Charisma,
+			&i.Quantity,
+			&i.Attack,
+			&i.Defense,
+			&i.Permille,
+			&i.Slot,
+		)
+		if err != nil {
 			return nil, errors.Wrap(err, "scan")
 		}
 
-		ids = append(ids, id)
+		items = append(items, i)
 	}
-	return ids, nil
+	return items, nil
 }
 
 func (srv *Service) CreateItem(i Item) (*Item, error) {

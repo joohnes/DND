@@ -43,14 +43,14 @@
 		<span class="text-3xl">Items</span>
 	</div>
 	<div class="flex flex-wrap flex-row gap-5 justify-center">
-		{#each $items as item}
-		<div>
-			<Item id={item} restart={restart}/>
+		{#each $items as itemelem}
+		<div class="flex-none">
+			<Item item={itemelem} restart={restart}/>
 		</div>
 		{/each}
 	</div>
 	{:else}
-		<div class="flex justify-center pb-6">
-			<span class="text-3xl">No Items</span>
-		</div>
+	<div class="flex justify-center pb-6">
+		<span class="text-3xl">No Items</span>
+	</div>
 {/if}

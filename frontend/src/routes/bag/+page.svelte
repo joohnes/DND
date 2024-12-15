@@ -22,11 +22,7 @@
 			const res = await fetch(HOST + "bag");
 			const data = await res.json();
 			bagItems.set(data.items);
-		}
-		{
-			const res = await fetch(HOST + "bag/holder")
-			const data = await res.json()
-			holder = data
+			holder = data.holder
 		}
 		GetPlayerNames()
 	}
@@ -95,13 +91,14 @@
 	<span class="text-3xl">Holder: {holder}</span>
 </div>
 {/if}
-
 <div class="flex flex-wrap gap-5 justify-center">
 	{#if $bagItems != null}
-	{#each $bagItems as item}
-		<Item id={item} bag={true} restart={restart}/>
-	{/each}
+		{#each $bagItems as item}
+			<div class="flex-none">
+				<Item item={item} bag={true} restart={restart}/>
+			</div>
+		{/each}
 	{:else}
-	<h1>No Items</h1>
+		<h1>No Items</h1>
 	{/if}
 </div>

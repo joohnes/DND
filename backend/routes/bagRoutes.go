@@ -4,7 +4,6 @@ import (
 	"dndEq/internal"
 	"encoding/json"
 	"log"
-	"log/slog"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -86,16 +85,6 @@ func DropItemFromBagRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 		}
 
 		return ctx.SendStatus(fiber.StatusOK)
-	}
-}
-
-func GetBagHolderRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
-	return func(ctx fiber.Ctx) error {
-		name, err := srv.GetBagHolderName()
-		if err != nil {
-			slog.Error(err.Error())
-		}
-		return ctx.JSON(name)
 	}
 }
 
