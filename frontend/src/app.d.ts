@@ -77,8 +77,8 @@ declare global {
 		accuracy_printable: string;
 		charisma_printable: string;
 		session?: number;
-		items?: number[];
-		equipped?: number[];
+		items?: Item[];
+		equipped?: Item[];
 		alcohol_level?: number;
 		zgon?: boolean;
 		is_holder?: boolean;

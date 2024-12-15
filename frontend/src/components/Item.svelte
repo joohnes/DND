@@ -3,30 +3,7 @@
 	import Modal from "./Modal.svelte"
   	import { HOST } from "$lib/host";
 
-	let i: Item;
 	onMount(async function () {
-		const res = await fetch(HOST + 'item/' + id);
-		const data = await res.json();
-		i = {
-			id: data.id,
-			name: data.name,
-			description: data.description,
-			ability: data.ability,
-			rarity: data.rarity,
-			strength: data.strength,
-			endurance: data.endurance,
-			perception: data.perception,
-			intelligence: data.intelligence,
-			agility: data.agility,
-			accuracy: data.accuracy,
-			charisma: data.charisma,
-			quantity: data.quantity,
-			attack: data.attack,
-			defense: data.defense,
-			permille: data.permille,
-			slot: data.slot,
-			owner: data.owner,
-		};
 		GetPlayerNames()
 	});
 	
@@ -49,20 +26,20 @@
 
 	async function Drop() {
 		if (!playerView) {
-			await fetch(HOST + "bag/drop/" + i.id, {
+			await fetch(HOST + "bag/drop/" + item.id, {
 				method: "DELETE",
 			})
 			showModal=false;
 			restart()
 		} else {
-			await fetch(HOST + "player/drop-item/" + i.id, {
+			await fetch(HOST + "player/drop-item/" + item.id, {
 				method: "DELETE",
 			})
 			window.location.href = window.location.origin + "/players"
 		}
 	}
 	async function DeleteItem() {
-		await fetch(HOST + "item/" + i.id, {
+		await fetch(HOST + "item/" + item.id, {
         method: "DELETE",
 		})
 		showModal=false;
@@ -70,7 +47,7 @@
 	}
 
 	async function TransferItemToBag() {
-		await fetch(HOST + "bag/add/" + i.id, {
+		await fetch(HOST + "bag/add/" + item.id, {
 			method: "POST",
 		})
 		showModal=false;
@@ -89,7 +66,7 @@
 			}
 		}
 
-		fetch(HOST + "bag/transfer/" + i.id + "/" + userId, {
+		fetch(HOST + "bag/transfer/" + item.id + "/" + userId, {
 			method: "POST",
 		})
 		showModal=false;
@@ -108,7 +85,7 @@
 			}
 		}
 
-		fetch(HOST + "player/" + userId + "/add-item/" + i.id, {
+		fetch(HOST + "player/" + userId + "/add-item/" + item.id, {
 			method: "POST",
 		})
 		showModal=false;
@@ -125,7 +102,7 @@
 	async function Equip() {
 		const data = {
 			playerID: playerID,
-			itemID: id,
+			itemID: item.id,
 		}
 
 		await fetch(HOST + "item/equip", {
@@ -136,7 +113,7 @@
 	}
 
 	async function Unequip() {
-		await fetch(HOST + "item/unequip/" + id, {
+		await fetch(HOST + "item/unequip/" + item.id, {
 			method: "DELETE",
 		})
 		restart()
@@ -144,7 +121,7 @@
 
 	let showModal = false;
 	let modalBag = false;
-	export let id: number = 0;
+	export let item: Item;
 	export let playerID: number = 0;
 	export let bag: boolean = false;
 	export let playerView: boolean = false;
@@ -199,95 +176,95 @@
 {/if}
 
 
-	{#if i != undefined}
+	{#if item != undefined}
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-		<div class="item collapse" tabindex="0">
+		<div class="item collapse cursor" tabindex="0">
 			<input id="open" type="checkbox"/>
 			<div class="flex justify-between collapse-title" style="padding-inline-end: 1rem!important;">
 				<div>
-					<div class="underline underline-offset-4">{i.name} x{i.quantity}</div>
-					{#if i.owner != ""}
-						<div class="name" style="text-overflow: ellipsis;">{i.owner}</div>
+					<div class="underline underline-offset-4">{item.name} x{item.quantity}</div>
+					{#if item.owner != ""}
+						<div class="name" style="text-overflow: ellipsis;">{item.owner}</div>
 					{/if}
 				</div>
 				<div style="z-index: 999!important;">
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<span on:click={()=>{modalBag=true;showModal=true;}}>💰</span>
-					<a href={window.location.origin+"/items/update/"+id}>⚙️</a>
+					<span class="cursor" on:click={()=>{modalBag=true;showModal=true;}}>💰</span>
+					<a class="cursor" href={window.location.origin+"/items/update/"+item.id}>⚙️</a>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<span on:click={()=>{modalBag=false;showModal=true;}}>❌</span>
+					<span class="cursor" on:click={()=>{modalBag=false;showModal=true;}}>❌</span>
 				</div>
 			</div>
 			<div class="collapse-content">
 				<div class="cellHolder">
-					<div class="badge badge-ghost badge-outline {rarityColorMap.get(i.rarity)}">{i.rarity}</div>
-					{#if i.slot != undefined}
-						<div class="badge badge-ghost badge-outline">{slotMap.get(i.slot)}</div>
+					<div class="badge badge-ghost badge-outline {rarityColorMap.get(item.rarity)}">{item.rarity}</div>
+					{#if item.slot != undefined}
+						<div class="badge badge-ghost badge-outline">{slotMap.get(item.slot)}</div>
 					{/if}
 				</div>
 				<div class="cellHolder">
-					<div class="badge badge-outline badge-accent my-auto">{i.permille}‰</div>
+					<div class="badge badge-outline badge-accent my-auto">{item.permille}‰</div>
 					<div>
-						<div class="badge badge-secondary badge-outline">ATK {i.attack}</div>
-						<div class="badge badge-info badge-outline">DEF {i.defense}</div>
+						<div class="badge badge-secondary badge-outline">ATK {item.attack}</div>
+						<div class="badge badge-info badge-outline">DEF {item.defense}</div>
 					</div>
 				</div>
 				<div class="cellHolder flex-col">
-					{#if i.strength > 0}
+					{#if item.strength > 0}
 					<div class="statsCell">
 						<div>Strength:</div>
-						<div>{i.strength}</div>
+						<div>{item.strength}</div>
 					</div>
 					{/if}
-					{#if i.endurance > 0}
+					{#if item.endurance > 0}
 					<div class="statsCell">
 						<div>Endurance:</div>
-						<div>{i.endurance}</div>
+						<div>{item.endurance}</div>
 					</div>
 					{/if}
-					{#if i.perception > 0}
+					{#if item.perception > 0}
 					<div class="statsCell">
 						<div>Perception:</div>
-						<div>{i.perception}</div>
+						<div>{item.perception}</div>
 					</div>
 					{/if}
-					{#if i.intelligence > 0}
+					{#if item.intelligence > 0}
 					<div class="statsCell">
 						<div>Intelligence:</div>
-						<div>{i.intelligence}</div>
+						<div>{item.intelligence}</div>
 					</div>
 					{/if}
-					{#if i.agility > 0}
+					{#if item.agility > 0}
 					<div class="statsCell">
 						<div>Agility:</div>
-						<div>{i.agility}</div>
+						<div>{item.agility}</div>
 					</div>
 					{/if}
-					{#if i.accuracy > 0}
+					{#if item.accuracy > 0}
 					<div class="statsCell">
 						<div>Accuracy:</div>
-						<div>{i.accuracy}</div>
+						<div>{item.accuracy}</div>
 					</div>
 					{/if}
-					{#if i.charisma > 0}
+					{#if item.charisma > 0}
 					<div class="statsCell">
 						<div>Charisma:</div>
-						<div>{i.charisma}</div>
+						<div>{item.charisma}</div>
 					</div>
 					{/if}
 				</div>
-				{#if i.description != undefined && i.description != ""}
+				{#if item.description != undefined && item.description != ""}
 				<div class="cellHolder">
-					<div>{i.description}</div>
+					<div>{item.description}</div>
 				</div>
 				{/if}
-				{#if i.ability != undefined && i.ability != ""}
+				{#if item.ability != undefined && item.ability != ""}
 				<div class="cellHolder">
-					<div>{i.ability}</div>
+					<div>{item.ability}</div>
 				</div>
 				{/if}
 			</div>
@@ -324,7 +301,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 	}
-	.info > div > span, .info > div > a {
+	.cursor {
 		cursor: pointer;
 	}
 	.name {

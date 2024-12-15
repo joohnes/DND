@@ -119,8 +119,8 @@
 </Modal>
 {:else if modalEq}
 <Modal bind:showModal fullScreen={true}>
-	{#if p.items != undefined && p.items.length > 0}
-		<PlayerEQ id={p.id}/>
+	{#if (p.items != undefined && p.items.length > 0) || (p.equipped != undefined && p.equipped.length > 0)}
+		<PlayerEQ items={p.items} equipped={p.equipped}/>
 	{:else}
 		<div class="text-lg">No Items in inventory</div>
 	{/if}

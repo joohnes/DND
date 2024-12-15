@@ -17,10 +17,10 @@ type Player struct {
 	Race    string `json:"race"`
 	Subrace string `json:"subrace"`
 	Stats
-	AlcoholLevel int   `json:"alcohol_level"`
-	Zgon         bool  `json:"zgon"`
-	Items        []int `json:"items"`
-	Equipped     []int `json:"equipped"`
+	AlcoholLevel int    `json:"alcohol_level"`
+	Zgon         bool   `json:"zgon"`
+	Items        []Item `json:"items"`
+	Equipped     []Item `json:"equipped"`
 }
 
 type PlayerResponse struct {
@@ -34,11 +34,11 @@ type PlayerResponse struct {
 	Subrace string `json:"subrace"`
 	Stats
 	StatsPrintable
-	AlcoholLevel int   `json:"alcohol_level"`
-	Zgon         bool  `json:"zgon"`
-	Equipped     []int `json:"equipped"`
-	Items        []int `json:"items"`
-	IsHolder     bool  `json:"is_holder"`
+	AlcoholLevel int    `json:"alcohol_level"`
+	Zgon         bool   `json:"zgon"`
+	Equipped     []Item `json:"equipped"`
+	Items        []Item `json:"items"`
+	IsHolder     bool   `json:"is_holder"`
 }
 
 type Stats struct {
@@ -68,31 +68,8 @@ type HPMana struct {
 }
 
 type ItemsResponse struct {
-	Items    []int `json:"items"`
-	Equipped []int `json:"equipped"`
-}
-
-// slots - 1 head, 2 chest, 3 shoulders, 4 hands, 5 legs, 6 feet
-func (p *Player) GetItems() ItemsResponse {
-	return ItemsResponse{Items: p.Items, Equipped: p.Equipped}
-}
-
-func (p *Player) IsEquipped(id int) bool {
-	for _, i := range p.Equipped {
-		if i == id {
-			return true
-		}
-	}
-	return false
-}
-
-func (p *Player) IsInEquipment(id int) bool {
-	for _, i := range p.Items {
-		if i == id {
-			return true
-		}
-	}
-	return false
+	Items    []Item `json:"items"`
+	Equipped []Item `json:"equipped"`
 }
 
 func (srv *Service) EquipItem(playerID, itemID int) error {
@@ -193,7 +170,85 @@ func (srv *Service) GetPlayerByID(id int) (*Player, error) {
 		return nil, errors.Wrap(err, "scan")
 	}
 
+	query = "SELECT * FROM items WHERE id in (SELECT item FROM player_items WHERE player = ?)"
+	rows, err := srv.db.Query(query, p.Id)
+	defer rows.Close()
+	if err != nil {
+		return nil, errors.Wrap(err, "query items")
+	}
+
+	itemsDB := make([]Item, 0)
+	for rows.Next() {
+		iDB := Item{}
+		err := rows.Scan(
+			&iDB.Id,
+			&iDB.Name,
+			&iDB.Description,
+			&iDB.Ability,
+			&iDB.Rarity,
+			&iDB.Strength,
+			&iDB.Endurance,
+			&iDB.Perception,
+			&iDB.Intelligence,
+			&iDB.Agility,
+			&iDB.Accuracy,
+			&iDB.Charisma,
+			&iDB.Quantity,
+			&iDB.Attack,
+			&iDB.Defense,
+			&iDB.Permille,
+			&iDB.Slot,
+		)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "scan item")
+		}
+
+		itemsDB = append(itemsDB, iDB)
+	}
+
+	query = "SELECT item FROM player_items WHERE player = ? AND equipped = 1"
+	rows, err = srv.db.Query(query, p.Id)
+	defer rows.Close()
+	if err != nil {
+		return nil, errors.Wrap(err, "query equipped")
+	}
+
+	equippedIDs := make([]int, 0)
+	for rows.Next() {
+		id := 0
+		err := rows.Scan(&id)
+		if err != nil {
+			return nil, errors.Wrap(err, "scan equipped")
+		}
+
+		equippedIDs = (append(equippedIDs, id))
+	}
+
+	for i, item := range itemsDB {
+		if in(item.Id, equippedIDs) {
+			p.Equipped = append(p.Equipped, item)
+			if i >= len(itemsDB) {
+				itemsDB = itemsDB[:i]
+			} else {
+				itemsDB = append(itemsDB[:i], itemsDB[i+1:]...)
+			}
+		}
+	}
+
+	p.Items = itemsDB
+
 	return p, nil
+}
+
+func in(item int, lst []int) bool {
+	for _, i := range lst {
+		if i == item {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (srv *Service) GetPlayerResponseByID(id int) (*PlayerResponse, error) {
@@ -203,8 +258,8 @@ func (srv *Service) GetPlayerResponseByID(id int) (*PlayerResponse, error) {
 	}
 
 	playerTotal := *player
-	for _, id := range player.Items {
-		item, err := srv.GetItemByID(id)
+	for _, i := range player.Items {
+		item, err := srv.GetItemByID(i.Id)
 		if err != nil {
 			continue
 		}
