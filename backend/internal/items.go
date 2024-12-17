@@ -132,6 +132,8 @@ func (srv *Service) GetItems() ([]*Item, error) {
 		}
 		return nil, errors.Wrap(err, "query")
 	}
+	defer rows.Close()
+
 	var items []*Item
 	for rows.Next() {
 		i := &Item{}
@@ -160,6 +162,34 @@ func (srv *Service) GetItems() ([]*Item, error) {
 
 		items = append(items, i)
 	}
+
+	owners := make(map[int]string, 0)
+	query = "SELECT i.item, p.name FROM player_items i INNER JOIN players p on i.player = p.id"
+	rowsOwners, err := srv.db.Query(query)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, errors.Wrap(err, "query")
+	}
+	defer rowsOwners.Close()
+
+	for rowsOwners.Next() {
+		var id int
+		var name string
+		if err := rowsOwners.Scan(&id, &name); err != nil {
+			return nil, errors.Wrap(err, "scan owners")
+		}
+
+		owners[id] = name
+	}
+
+	for _, item := range items {
+		if owner, exist := owners[item.Id]; exist {
+			item.Owner = owner
+		}
+	}
+
 	return items, nil
 }
 

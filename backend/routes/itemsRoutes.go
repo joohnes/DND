@@ -4,7 +4,9 @@ import (
 	"dndEq/internal"
 	"encoding/json"
 	"log"
+	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/pkg/errors"
@@ -42,6 +44,11 @@ func GetItemsRoute(srv *internal.Service) func(ctx fiber.Ctx) error {
 			log.Println(errors.Wrap(err, "GetItemsIDs"))
 			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.ErrInternalServerError)
 		}
+
+		sort.Slice(ids, func(i, j int) bool {
+			return strings.ToLower(ids[i].Name) < strings.ToLower(ids[j].Name)
+		})
+
 		return ctx.JSON(ids)
 	}
 }

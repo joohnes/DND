@@ -131,60 +131,58 @@
 </script>
 
 {#key showModal}
-{#if !modalBag}
-<Modal bind:showModal>
-	<span class="mb-4">Delete item?</span>
-	<button class="btn btn-error btn-outline btn-md hover:btn-outline" on:click={()=> {DeleteItem()}}>DELETE</button>
-</Modal>
-{:else}
-<Modal bind:showModal>
-	<div class="flex gap-24">
-		<div class="flex flex-col justify-start content-start">
-		{#if !bag}
-				<button class="btn btn-outline btn-info btn-md mb-4 hover:btn-outline px-8" on:click={()=>{TransferItemToBag()}}>To Bag</button>
+	{#if !modalBag}
+	<Modal bind:showModal>
+		<span class="mb-4">Delete item?</span>
+		<button class="btn btn-error btn-outline btn-md hover:btn-outline" on:click={()=> {DeleteItem()}}>DELETE</button>
+	</Modal>
+	{:else}
+	<Modal bind:showModal>
+		<div class="flex gap-24">
+			<div class="flex flex-col justify-start content-start">
+			{#if !bag}
+					<button class="btn btn-outline btn-info btn-md mb-4 hover:btn-outline px-8" on:click={()=>{TransferItemToBag()}}>To Bag</button>
+				{/if}
+			{#if bag || playerView || eqView}
+				{#if eqView}
+					<div class="flex flex-col justify-center">
+						{#if !equipped}
+						<button on:click={Equip} class="btn btn-outline btn-accent btn-md hover:btn-outline mb-4 px-8">Equip</button>
+						{:else}
+						<button on:click={Unequip} class="btn btn-outline btn-error btn-md hover:btn-outline mb-4 px-8">Unequip</button>
+						{/if}
+					</div>
+				{/if}
+				{#if bag || playerView}
+					<button class="btn btn-outline btn-error btn-md px-8" on:click={()=>{Drop()}}>Drop item</button>
+				{/if}
 			{/if}
-		{#if bag || playerView || eqView}
-			{#if eqView}
-				<div class="flex flex-col justify-center">
-					{#if !equipped}
-					<button on:click={Equip} class="btn btn-outline btn-accent btn-md hover:btn-outline mb-4 px-8">Equip</button>
-					{:else}
-					<button on:click={Unequip} class="btn btn-outline btn-error btn-md hover:btn-outline mb-4 px-8">Unequip</button>
-					{/if}
-				</div>
-			{/if}
-			{#if bag || playerView}
-				<button class="btn btn-outline btn-error btn-md px-8" on:click={()=>{Drop()}}>Drop item</button>
-			{/if}
-		{/if}
-	</div>
-		{#if names != null}
-		<div class="flex flex-col justify-start content-start">
-			<form on:submit|preventDefault={bag ? TransferItemToPlayer : AddItemToPlayer} class="flex flex-col justify-center">
-				<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
-					<option disabled selected>Select Player</option>
-					{#each Object.entries(names) as id}
-						<option>{id[1]}</option>
-					{/each}
-				</select>
-				<input class="btn" type="submit" value="Change">
-			</form>
 		</div>
-		{/if}
-	</div>
-</Modal>
-{/if}
-
-
+			{#if names != null}
+			<div class="flex flex-col justify-start content-start">
+				<form on:submit|preventDefault={bag ? TransferItemToPlayer : AddItemToPlayer} class="flex flex-col justify-center">
+					<select name="select-player" class="select select-bordered w-full max-w-xs mb-4">
+						<option disabled selected>Select Player</option>
+						{#each Object.entries(names) as id}
+							<option>{id[1]}</option>
+						{/each}
+					</select>
+					<input class="btn" type="submit" value="Change">
+				</form>
+			</div>
+			{/if}
+		</div>
+	</Modal>
+	{/if}
 	{#if item != undefined}
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<div class="item collapse cursor" tabindex="0">
 			<input id="open" type="checkbox"/>
 			<div class="flex justify-between collapse-title" style="padding-inline-end: 1rem!important;">
-				<div>
+				<div class="grow">
 					<div class="underline underline-offset-4">{item.name} x{item.quantity}</div>
 					{#if item.owner != ""}
-						<div class="name" style="text-overflow: ellipsis;">{item.owner}</div>
+						<div class="name">Owner: {item.owner}</div>
 					{/if}
 				</div>
 				<div style="z-index: 999!important;">
@@ -305,8 +303,7 @@
 		cursor: pointer;
 	}
 	.name {
-		width: 9rem;
-		text-overflow: ellipsis;
+		text-overflow: clip;
 		overflow: hidden;
 	}
 	#open:checked + div > div > .name {

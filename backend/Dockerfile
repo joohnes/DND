@@ -1,8 +1,8 @@
 FROM golang:latest AS builder
 WORKDIR /app/backend
-COPY ./backend/go.mod ./backend/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
-COPY ./backend .
+COPY . .
 RUN CGO_ENABLED=0 go build -o main .
 
 FROM gcr.io/distroless/static-debian12
