@@ -19,21 +19,14 @@ func ConnectDB() (*sql.DB, error) {
 	var db *sql.DB
 	var err error
 
-	if cfg.Production {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", cfg.DBUsername, cfg.DBPassword, cfg.DBAdress, cfg.DBName)
-		db, err = sql.Open("mysql", dsn)
-		if err != nil {
-			panic(err)
-		}
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", cfg.DBUsername, cfg.DBPassword, cfg.DBHost, cfg.DBName)
+	db, err = sql.Open("mysql", dsn)
+	if err != nil {
+		panic(err)
+	}
 
-		if err := db.Ping(); err != nil {
-			panic(err)
-		}
-	} else {
-		db, err = sql.Open("sqlite3", database)
-		if err != nil {
-			return nil, err
-		}
+	if err := db.Ping(); err != nil {
+		panic(err)
 	}
 
 	err = createDB(db)
