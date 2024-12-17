@@ -1,4 +1,23 @@
 services:
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "8001:8001"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+      start_period: 10s
+
   backend:
     container_name: backend
     build:
@@ -12,7 +31,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     container_name: frontend
@@ -23,19 +43,6 @@ services:
       - "5178:5178"
     depends_on:
       - backend
-
-  db:
-    image: mysql:8.0
-    container_name: mysql
-    ports:
-      - "8001:8001"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
 
 volumes:
   mysql_data:
